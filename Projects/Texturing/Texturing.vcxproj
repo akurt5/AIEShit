@@ -75,9 +75,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sprite_Class.cpp" />
     <ClCompile Include="Texturing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sprite_Class.h" />
     <ClInclude Include="Texturing.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

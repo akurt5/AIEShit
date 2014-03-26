@@ -75,11 +75,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FBX_Class.cpp" />
     <ClCompile Include="Shader_Class.cpp" />
+    <ClCompile Include="Sprite_Class.cpp" />
     <ClCompile Include="Tesselation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FBX_Class.h" />
+    <ClInclude Include="Render_Class.h" />
     <ClInclude Include="Shader_Class.h" />
+    <ClInclude Include="Sprite_Class.h" />
     <ClInclude Include="Tesselation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

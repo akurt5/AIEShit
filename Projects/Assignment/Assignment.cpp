@@ -39,12 +39,12 @@ bool Assignment::onCreate(int a_argc, char* a_argv[])
 	AnimShader = new ShaderHandle();
 	AnimShader->Load("anim", "anim");
 
-	Rabbit = new FBXHandle();
-	Rabbit->Load("stanford/bunny", FBXFile::UNITS_CENTIMETER);
+	//Rabbit = new FBXHandle();
+	//Rabbit->Load("stanford/bunny", FBXFile::UNITS_CENTIMETER);
+	//Rabbit->Load("NETMODELS/BF3_russ_engi", FBXFile::UNITS_CENTIMETER);
 
 	Pyro = new FBXHandle();
 	Pyro->Load("characters/demolition/demolition", FBXFile::UNITS_METER);
-
 	//MeshList.push_back(Rabbit);
 	//MeshList.push_back(Pyro);
 
@@ -90,10 +90,10 @@ void Assignment::onUpdate(float a_deltaTime)
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		quit();
 
-	Rabbit->Update(LightShader);
+	//Rabbit->Update(LightShader);
 	Pyro->Update(AnimShader);
 	Pyro->Move(glm::vec3(1500, 0, 0));
-	
+		
 	Emitter1->Update(a_deltaTime, glm::vec3(-2, -2, 0));
 	Emitter2->Update(a_deltaTime, glm::vec3(0, 2, 5));
 
@@ -122,7 +122,7 @@ void Assignment::onDraw()
 	
 	Gizmos::draw(viewMatrix, m_projectionMatrix);
 	
-	Rabbit->Draw(viewMatrix, m_projectionMatrix, LightShader);
+	//Rabbit->Draw(viewMatrix, m_projectionMatrix, LightShader);
 	Pyro->Draw(viewMatrix, m_projectionMatrix, AnimShader);
 	//Lighting->Draw(viewMatrix, m_projectionMatrix, MeshList, LightShader);
 
@@ -135,7 +135,7 @@ void Assignment::onDestroy()
 	Gizmos::destroy();
 	
 	LightShader->Unload();
-	Rabbit->Unload();
+	//Rabbit->Unload();
 	Pyro->Unload();
 	
 	//Lighting->Unload(MeshList);

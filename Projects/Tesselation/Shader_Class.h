@@ -19,7 +19,7 @@ public:
 	ShaderHandle();
 	virtual~ShaderHandle();
 	//FILE TYPE ONLY 4 CHAR AFTER '.' (#shaders, .vert, .frag, .geom...)
-	void Load(int _Count, char *_Shader, ...);
+	void Load(int _Count, ...);
 
 	void Reload(GLFWwindow *_Window, int _Key);
 	void Unload();

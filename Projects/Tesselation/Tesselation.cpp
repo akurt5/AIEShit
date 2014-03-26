@@ -38,8 +38,10 @@ bool Tesselation::onCreate(int a_argc, char* a_argv[])
 	//Load = new ShaderPath();
 	//Load->Load("displace.vert");
 	Shaders = new ShaderHandle();
-	Shaders->Load(4, "displace.vert", "displace.frag", "displace.cont", "displace.eval");
+	Shaders->Load(2, "displace.vert", "displace.frag"/*, "displace.cont", "displace.eval"*/);
 
+	Sprite = new SpriteHandle();
+	Sprite->Load(2, "rock_diffuse.tga", "rock_displacement.tga");
 	return true;
 }
 

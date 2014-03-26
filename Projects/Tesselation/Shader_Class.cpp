@@ -5,16 +5,22 @@ ShaderHandle::ShaderHandle(){}
 ShaderHandle::~ShaderHandle(){}
 
 
-void ShaderHandle::Load(int _Count, char *_Shader, ...)
+void ShaderHandle::Load(int _Count, ...)
 {
-	va_list Shaders;
-	va_start (Shaders, _Shader);
 	char *a;
+	va_list VariablePathList;
+	va_start (VariablePathList, _Count);
 	
+	
+		vshader = 0;
+		cshader = 0;
+		eshader = 0;
+		gshader = 0;
+		fshader = 0;
 
-	for(int i=0; i!=_Count-1; ++i){
+	for(int i=0; i!=_Count; i++){
 	
-		a = va_arg(Shaders, char*);
+		a = va_arg(VariablePathList, char *);
 		
 		std::string sName(a);
 		
@@ -23,11 +29,7 @@ void ShaderHandle::Load(int _Count, char *_Shader, ...)
 		sType.append(sName.end()-4, sName.end());
 		//all shaders equal 0
 		//allows us to use only what we want
-		vshader = 0;
-		cshader = 0;
-		eshader = 0;
-		gshader = 0;
-		fshader = 0;
+		
 		
 		std::stringstream ssPath;
 
@@ -63,7 +65,7 @@ void ShaderHandle::Load(int _Count, char *_Shader, ...)
 		printf(PathList[i]);printf("\n");
 
 	}
-	va_end (Shaders);
+	va_end (VariablePathList);
 		
 	const char* aszInputs[] =  { "Position", "Color", "Normal", "Tangent", "Binormal", "Indices", "Weights", "Texcoord1", "Texcoord2" };
 	const char* aszOutputs[] = { "outColour" };

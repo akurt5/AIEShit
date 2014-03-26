@@ -18,9 +18,15 @@
     <ClCompile Include="Texturing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sprite_Class.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texturing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite_Class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

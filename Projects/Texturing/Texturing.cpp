@@ -26,18 +26,6 @@ bool Texturing::onCreate(int a_argc, char* a_argv[])
 	// initialise the Gizmos helper class
 	Gizmos::create();
 
-	m_texture = SOIL_load_OGL_texture("../../Build/textures/planets/jupiter_diffuse.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-
-	Utility::build3DPlane(10, m_vao, m_vbo, m_ibo);
-	
-	// load shaders and link shader program
-	m_vertShader = Utility::loadShader("../../Build/shaders/Simple.vert", GL_VERTEX_SHADER);
-	m_fragShader = Utility::loadShader("../../Build/shaders/Simple.frag", GL_FRAGMENT_SHADER);
-
-	// our vertex buffer has 3 properties per-vertex
-	const char* inputs[] = { "position", "colour", "textureCoordinate" };
-	m_shader = Utility::createProgram(m_vertShader,0,0,0,m_fragShader, 3, inputs);
-
 	// create a world-space matrix for a camera
 	m_cameraMatrix = glm::inverse( glm::lookAt(glm::vec3(10,10,10),glm::vec3(0,0,0), glm::vec3(0,1,0)) );
 	
@@ -89,46 +77,10 @@ void Texturing::onDraw()
 	// draw the gizmos from this frame
 	Gizmos::draw(viewMatrix, m_projectionMatrix);
 
-	// bind shader to the GPU
-	glUseProgram(m_shader);
-
-	// fetch locations of the view and projection matrices and bind them
-	unsigned int location = glGetUniformLocation(m_shader,"view");
-	glUniformMatrix4fv(location, 1, false, glm::value_ptr(viewMatrix));
-
-	location = glGetUniformLocation(m_shader,"projection");
-	glUniformMatrix4fv(location, 1, false, glm::value_ptr(m_projectionMatrix));
-
-	// activate texture slot 0 and bind our texture to it
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
-
-	// fetch the location of the texture sampler and bind it to 0
-	location = glGetUniformLocation(m_shader,"textureMap");
-	glUniform1i(location, 0);
-
-	// bind out 3D plane and draw it
-	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
 void Texturing::onDestroy()
 {
-	// clean up anything we created
-	Gizmos::destroy();
-	// delete the data for the plane
-	glDeleteVertexArrays(1, &m_vao);
-	glDeleteBuffers(1, &m_vbo);
-	glDeleteBuffers(1, &m_ibo);
-
-	// delete the texture
-	glDeleteTextures(1, &m_texture);
-
-	// delete the shader
-	glDeleteProgram(m_shader);
-	glDeleteShader(m_vertShader);
-	glDeleteShader(m_fragShader);
-
 	// clean up anything we created
 	Gizmos::destroy();
 }

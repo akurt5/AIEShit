@@ -3,14 +3,9 @@
 
 #include "Application.h"
 #include <glm/glm.hpp>
-#include "Shader_Class.h"
 
-struct OGL_FBXRenderData
-{
-	unsigned int VBO; // vertex buffer object
-	unsigned int IBO; // index buffer object
-	unsigned int VAO; // vertex array object
-};
+//#include "Shader_Class.h"
+#include "Sprite_Class.h"
 
 // Derived application class that wraps up all globals neatly
 class Tesselation : public Application
@@ -29,6 +24,7 @@ protected:
 
 	OGL_FBXRenderData RenderData;
 	ShaderHandle *Shaders;
+	SpriteHandle *Sprite;
 
 	glm::mat4	m_cameraMatrix;
 	glm::mat4	m_projectionMatrix;
