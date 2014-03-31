@@ -21,9 +21,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Animation", "Animation\Anim
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tesselation", "Tesselation\Tesselation.vcxproj", "{8462CA93-0A57-4373-A8B6-47A92DDF8A04}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assignment", "Assignment\Assignment.vcxproj", "{D87CFA99-3906-4E3E-A7AB-A9A87E5C9D02}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assignment-Fast and Beautiful", "Assignment\Assignment.vcxproj", "{D87CFA99-3906-4E3E-A7AB-A9A87E5C9D02}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Solar system", "Solar System\Solar System.vcxproj", "{5AF3AD57-DBBC-454E-AB3D-D3388BAD982A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NavMesh", "Tut 04 - Advanced Navigation\NavMesh\NavMesh.vcxproj", "{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{5AF3AD57-DBBC-454E-AB3D-D3388BAD982A}.Debug|Win32.Build.0 = Debug|Win32
 		{5AF3AD57-DBBC-454E-AB3D-D3388BAD982A}.Release|Win32.ActiveCfg = Release|Win32
 		{5AF3AD57-DBBC-454E-AB3D-D3388BAD982A}.Release|Win32.Build.0 = Release|Win32
+		{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}.Debug|Win32.Build.0 = Debug|Win32
+		{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}.Release|Win32.ActiveCfg = Release|Win32
+		{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
