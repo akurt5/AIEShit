@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assignment-Fast and Beautif
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Solar system", "Solar System\Solar System.vcxproj", "{5AF3AD57-DBBC-454E-AB3D-D3388BAD982A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NavMesh", "Tut 04 - Advanced Navigation\NavMesh\NavMesh.vcxproj", "{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NavMesh", "Tut 04 - Advanced Navigation\NavMesh.vcxproj", "{CEEB4D60-8317-4E9B-ADED-BD9625EA8489}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
