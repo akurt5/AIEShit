@@ -7,7 +7,6 @@
 
 
 
-FBXHandle Mesh;
 
 Advanced_Texturing::Advanced_Texturing()
 {
@@ -35,7 +34,11 @@ bool Advanced_Texturing::onCreate(int a_argc, char* a_argv[])
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-	Mesh.Load(/*"./Models/soulspear/soulspear.fbx"*/);
+	Shader = new ShaderHandle();
+	Shader->Load(2, "MultipleTextures.vert", "MultipleTextures.frag");
+
+	Mesh = new FBXHandle();
+	Mesh->Load("soulspear/soulspear.fbx");
 
 
 	return true;
@@ -66,13 +69,13 @@ void Advanced_Texturing::onUpdate(float a_deltaTime)
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		quit();
 
-	if (glfwGetKey(m_window,GLFW_KEY_LEFT) == GLFW_PRESS) Mesh.m_decayValue -= a_deltaTime;
-	if (glfwGetKey(m_window,GLFW_KEY_RIGHT) == GLFW_PRESS) Mesh.m_decayValue += a_deltaTime;
+	if (glfwGetKey(m_window,GLFW_KEY_LEFT) == GLFW_PRESS) Mesh->m_decayValue -= a_deltaTime;
+	if (glfwGetKey(m_window,GLFW_KEY_RIGHT) == GLFW_PRESS) Mesh->m_decayValue += a_deltaTime;
 
-	if( Mesh.m_decayValue < 0.0f) Mesh.m_decayValue = 0.0f;
-	if( Mesh.m_decayValue > 1.0f) Mesh.m_decayValue = 1.0f;
-
-	Mesh.Update();
+	if( Mesh->m_decayValue < 0.0f) Mesh->m_decayValue = 0.0f;
+	if( Mesh->m_decayValue > 1.0f) Mesh->m_decayValue = 1.0f;
+	
+	Mesh->Update(Shader);
 }
 
 void Advanced_Texturing::onDraw() 
@@ -86,7 +89,7 @@ void Advanced_Texturing::onDraw()
 	// draw the gizmos from this frame
 	Gizmos::draw(viewMatrix, m_projectionMatrix);
 
-	Mesh.Draw(viewMatrix, m_projectionMatrix);
+	Mesh->Draw(viewMatrix, m_projectionMatrix);
 }
 
 void Advanced_Texturing::onDestroy()

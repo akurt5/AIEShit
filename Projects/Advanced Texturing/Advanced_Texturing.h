@@ -19,6 +19,9 @@ public:
 	virtual ~Advanced_Texturing();
 
 protected:
+	ShaderHandle *Shader;
+	FBXHandle *Mesh;
+
 
 	virtual bool onCreate(int a_argc, char* a_argv[]);
 	virtual void onUpdate(float a_deltaTime);

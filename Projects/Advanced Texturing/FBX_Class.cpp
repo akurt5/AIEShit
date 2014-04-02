@@ -5,23 +5,20 @@
 
 FBXHandle::FBXHandle(){}
 FBXHandle::~FBXHandle(){}
-void FBXHandle::Load(const char* _MODELpath/*, char* _VERTpath*/ ){
-// load the shader
-	const char* aszInputs[] =  { "Position", "Normal", "Tangent", "BiNormal", "TexCoord1" };
-	const char* aszOutputs[] = { "outColour" };
+//void FBXHandle::Load(const char* _MODELpath/*, char* _VERTpath*/ ){
+void FBXHandle::Load(const char*_MODEL, FBXFile::UNIT_SCALE _Scale)
+{
+	HasSkeleton = false;
 
-	//std::string _VERTpath();
-	//std::string::append("../Build/shaders/", _VERTpath, ".vert");
+	std::stringstream sMODEL;
+	sMODEL << "../../Build/Models/" << _MODEL << ".fbx";
+	std::string sMODELpath = sMODEL.str();
+	MODEL = sMODELpath.c_str();
 
-	// load shader internally calls glCreateShader...
-	GLuint vshader = Utility::loadShader("../Build/shaders/MultipleTextures.vert", GL_VERTEX_SHADER);
-	GLuint pshader = Utility::loadShader("../Build/shaders/MultipleTextures.frag", GL_FRAGMENT_SHADER);
-	
-	m_shader = Utility::createProgram( vshader, 0, 0, 0, pshader, 3, aszInputs, 1, aszOutputs);
-		
+
 	m_fbx = new FBXFile();
-	m_fbx->load(_MODELpath, FBXFile::UNITS_CENTIMETER );
 	
+	m_fbx->load(MODEL, _Scale);
 
 	unsigned int meshCount = m_fbx->getMeshCount();
 	unsigned int matCount = m_fbx->getMaterialCount();
@@ -50,37 +47,55 @@ void FBXHandle::Load(const char* _MODELpath/*, char* _VERTpath*/ ){
 
 		// Send the vertex data to the VBO
 		glBufferData(GL_ARRAY_BUFFER, pMesh->m_vertices.size() * sizeof(FBXVertex), pMesh->m_vertices.data(), GL_STATIC_DRAW);
-		
+
 		// send the index data to the IBO
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pMesh->m_indices.size() * sizeof(unsigned int), pMesh->m_indices.data(), GL_STATIC_DRAW);
 
 		// enable the attribute locations that will be used on our shaders
-		glEnableVertexAttribArray(0);//Position
-		glEnableVertexAttribArray(1);//Colour
-		glEnableVertexAttribArray(2);//Tangent
-		glEnableVertexAttribArray(3);//BiNorm
-		glEnableVertexAttribArray(4);//TexCoord1Offset
-		
+		glEnableVertexAttribArray(0);//POSITION
+		glEnableVertexAttribArray(1);//COLOUR	
+		glEnableVertexAttribArray(2);//NORMAL	
+		glEnableVertexAttribArray(3);//TANGENT	
+		glEnableVertexAttribArray(4);//BINORMAL
+		glEnableVertexAttribArray(5);//INDICES	
+		glEnableVertexAttribArray(6);//WEIGHTS	
+		glEnableVertexAttribArray(7);//TEXCOORD1
+		glEnableVertexAttribArray(8);//TEXCOORD2
+
 		// tell our shaders where the information within our buffers lie
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::PositionOffset);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::ColourOffset);
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::TangentOffset);
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::BiNormalOffset);
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::TexCoord1Offset);
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::NormalOffset);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::TangentOffset);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::BiNormalOffset);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::IndicesOffset);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::WeightsOffset);
+		glVertexAttribPointer(7, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::TexCoord1Offset);
+		glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (char *)FBXVertex::TexCoord2Offset);
 
 		// finally, where done describing our mesh to the shader
 		// we can describe the next mesh
 		glBindVertexArray(0);
 	}
-	
-	// free our shader once we built our program
-	glDeleteShader( vshader );
-	glDeleteShader( pshader );
+
+	if(m_fbx->getSkeletonCount() != 0){
+		HasSkeleton = true;
+		printf("Skeleton FOUND for   ");printf( _MODEL);printf("\n");
+	}else{
+		printf("Skeleton NOT found for   ");printf(_MODEL);printf("\n");
+	}
+
+	if(m_fbx->getTextureCount() != 0){
+		HasTextures = true;
+		printf("Textures FOUND for   ");printf( _MODEL);printf( "\n");
+	}else{
+		printf("Textures NOT found for   ");printf(_MODEL);printf("\n");
+	}
+
 }
 void FBXHandle::Unload(){
-	glDeleteShader(m_shader);
 
-		// how manu meshes and materials are stored within the fbx file
+	// how manu meshes and materials are stored within the fbx file
 	unsigned int meshCount = m_fbx->getMeshCount();
 	unsigned int matCount = m_fbx->getMaterialCount();
 
@@ -117,10 +132,9 @@ void FBXHandle::Unload(){
 	m_fbx->unload();
 	delete m_fbx;
 	m_fbx = NULL;
-	glDeleteTextures(1, &m_decayTexture ); 
 
 }
-void FBXHandle::Update()
+void FBXHandle::Update( ShaderHandle *_Shaders)
 {
 	for(int i=0; i<m_fbx->getMeshCount(); ++i)
 	{
@@ -131,27 +145,53 @@ void FBXHandle::Update()
 		// children nodes are not updated until this function is called.
 		mesh->updateGlobalTransform();
 	}
-}
-void FBXHandle::Draw(glm::mat4 a_view, glm::mat4 a_projection)
-{
-// enable transparent blending
-	glEnable(GL_BLEND);
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 
+}
+void FBXHandle::Draw(glm::mat4 a_view, glm::mat4 a_projection, ShaderHandle *_Shaders)
+{
 	// activate a shader
-	glUseProgram( m_shader );
+
+	glUseProgram( _Shaders->m_shader );
+	
+	//Tell the shader if textures / skeleton are present
+	location = glGetUniformLocation(_Shaders->m_shader,"Animate");
+	glUniform1f(location, HasSkeleton);
+
+	location = glGetUniformLocation(_Shaders->m_shader,"Texture");
+	glUniform1f(location, HasTextures);
+
+	if(HasSkeleton){
+
+		//Animation
+		// grab the skeleton and animation we want to use
+		FBXSkeleton* skeleton = m_fbx->getSkeletonByIndex(0);
+		FBXAnimation* animation = m_fbx->getAnimationByIndex(0);
+
+		// evaluate the animation to update bones
+		skeleton->updateBones();
+		skeleton->evaluate( animation, Utility::getTotalTime() );
+		int location = glGetUniformLocation(_Shaders->m_shader, "bones");
+		glUniformMatrix4fv(location, skeleton->m_boneCount, GL_FALSE, (float*)skeleton->m_bones);
+
+		
+	}
+
+
+
+	//float time = glGetUniformLocation(_Shaders->m_shader, "Time");
 
 	// get the location of uniforms on the shader
-	GLint uDiffuseTexture		= glGetUniformLocation(m_shader, "DiffuseTexture");
-	GLint uDiffuseColor			= glGetUniformLocation(m_shader, "DiffuseColor");	
+	GLint uDiffuseTexture = glGetUniformLocation(_Shaders->m_shader, "DiffuseTexture");
+	GLint uDiffuseColor   = glGetUniformLocation(_Shaders->m_shader, "DiffuseColor");	
 
-	GLint uModel				= glGetUniformLocation(m_shader, "Model");
-	GLint uView					= glGetUniformLocation(m_shader, "View");
-	GLint uProjection			= glGetUniformLocation(m_shader, "Projection");
+	GLint uModel      = glGetUniformLocation(_Shaders->m_shader, "Model");
 
-	GLint uDecayTexture			= glGetUniformLocation(m_shader, "DecayTexture");
-	GLint uDecayValue			= glGetUniformLocation(m_shader, "DecayValue");
-	
+	//fetch locations of the view and projection matrices and bind them
+	GLint uView = glGetUniformLocation(_Shaders->m_shader,"View");
+
+	GLint uProjection = glGetUniformLocation(_Shaders->m_shader,"Projection");
+
 	// for each mesh in the model...
 	for(int i=0; i<m_fbx->getMeshCount(); ++i)
 	{
@@ -165,22 +205,17 @@ void FBXHandle::Draw(glm::mat4 a_view, glm::mat4 a_projection)
 		// if your shader supported multiple textures, you would bind each texture to a new Active Texture ID here
 		glActiveTexture( GL_TEXTURE1 );
 		glBindTexture( GL_TEXTURE_2D, mesh->m_material->textureIDs[ FBXMaterial::DiffuseTexture] );
-		glUniform1i(uDiffuseTexture, mesh->m_material->textureIDs[ FBXMaterial::DiffuseTexture]);
 
-		glActiveTexture( GL_TEXTURE2 );
-		glBindTexture( GL_TEXTURE_2D, m_decayTexture );
+		// reset back to the default active texture
+		glActiveTexture( GL_TEXTURE0 );
 
 		// tell the shader which texture to use
 		glUniform1i( uDiffuseTexture, 1 );
-		glUniform1i( uDecayTexture, 2 );
 
-		// tell the shader the decay value
-		glUniform1f( uDecayValue, m_decayValue );
-	 
 		// send the Model, View and Projection Matrices to the shader
-		glUniformMatrix4fv( uModel,			1, false, glm::value_ptr(mesh->m_globalTransform) );
-		glUniformMatrix4fv( uView,			1, false, glm::value_ptr(a_view) );
-		glUniformMatrix4fv( uProjection,	1, false, glm::value_ptr(a_projection) );
+		glUniformMatrix4fv( uModel,	     1, false, glm::value_ptr(mesh->m_globalTransform) );
+		glUniformMatrix4fv( uView,       1, false, glm::value_ptr(a_view) );
+		glUniformMatrix4fv( uProjection, 1, false, glm::value_ptr(a_projection) );
 
 		// bind our vertex array object
 		// remember in the initialise function, we bound the VAO and IBO to the VAO
@@ -191,11 +226,19 @@ void FBXHandle::Draw(glm::mat4 a_view, glm::mat4 a_projection)
 
 	}
 
-	// reset back to the default active texture
-	glActiveTexture( GL_TEXTURE0 );
-
 	// finally, we have finished rendering the meshes
 	// disable this shader
 	glUseProgram(0);
 }
+void FBXHandle::Move(glm::vec3 _Position){
+	for(int i=0; i<m_fbx->getMeshCount(); ++i)
+	{
+		FBXMeshNode *mesh = m_fbx->getMeshByIndex(i);
+
+
+		mesh->m_globalTransform *= glm::translate(_Position);
+	}
+}
+
+
 

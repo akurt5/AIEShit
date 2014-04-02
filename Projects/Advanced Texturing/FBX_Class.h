@@ -10,7 +10,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
 #include <SOIL.h>
-#include <string>
+
+#include "Shader_Class.h"
+//#include "Light_Class.h"
 
 struct OGL_FBXRenderData
 {
@@ -26,16 +28,26 @@ public:
 	FBXHandle();
 	virtual~FBXHandle();
 	
-	void Load(const char* _MODELpath = "./Models/soulspear/soulspear.fbx"/*, char* _VERTpath*/ );
-	void Update();
-	void Draw(glm::mat4 a_view, glm::mat4 a_projection);
+	//void Load(const char* _MODELpath = "./Models/soulspear/soulspear.fbx"/*, char* _VERTpath*/ );
+	void Load(const char *_MODEL, FBXFile::UNIT_SCALE _Scale = FBXFile::UNITS_METER);
+	void Update( ShaderHandle *_Shaders);
+	void Draw(glm::mat4 a_view, glm::mat4 a_projection, ShaderHandle *_Shaders);
+	void Move(glm::vec3 _Position);
 	void Unload();
 	
-	FBXFile* m_fbx;
+	FBXFile *m_fbx;
 
-	unsigned int m_decayTexture;
-	unsigned int m_decayValue;
-	unsigned int m_shader;
+	//ShaderHandle Shaders;
+
+	int location;
+
+	bool HasSkeleton;
+	bool HasTextures;
+	
+	const char *MODEL;
+	GLint uDiffuseTexture;
+
+protected:
 
 };
 

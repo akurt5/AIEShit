@@ -29,6 +29,8 @@ protected:
 
 	std::vector <NavNode*> m_Graph;
 
+	void Path(std::vector<NavNode*> _Open, std::vector<NavNode*> _Closed, );
+
 	void BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph);
 
 	void	createOpenGLBuffers(FBXFile* a_fbx);

@@ -77,10 +77,12 @@
   <ItemGroup>
     <ClCompile Include="Advanced_Texturing.cpp" />
     <ClCompile Include="FBX_Class.cpp" />
+    <ClCompile Include="Shader_Class.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Advanced_Texturing.h" />
     <ClInclude Include="FBX_Class.h" />
+    <ClInclude Include="Shader_Class.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
