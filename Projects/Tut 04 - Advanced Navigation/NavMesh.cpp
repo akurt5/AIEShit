@@ -3,7 +3,9 @@
 #include "Utilities.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <algorithm>
 
 #define DEFAULT_SCREENWIDTH 1280
 #define DEFAULT_SCREENHEIGHT 720
@@ -12,12 +14,10 @@ NavMesh::NavMesh()
 {
 
 }
-
 NavMesh::~NavMesh()
 {
 
 }
-
 bool NavMesh::onCreate(int a_argc, char* a_argv[]) 
 {
 	// initialise the Gizmos helper class
@@ -50,9 +50,14 @@ bool NavMesh::onCreate(int a_argc, char* a_argv[])
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
+
+	
+	//Closed.emplace_back(Open[3]);
+	//delete Open[3];
+	Path(Open, Closed, Open[3], Open[4]);
+
 	return true;
 }
-
 void NavMesh::onUpdate(float a_deltaTime) 
 {
 	// update our camera matrix using the keyboard/mouse
@@ -96,7 +101,6 @@ void NavMesh::onUpdate(float a_deltaTime)
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		quit();
 }
-
 void NavMesh::onDraw() 
 {
 	// clear the backbuffer
@@ -130,7 +134,6 @@ void NavMesh::onDraw()
 	// draw the gizmos from this frame
 	Gizmos::draw(viewMatrix, m_projectionMatrix);
 }
-
 void NavMesh::onDestroy()
 {
 	cleanupOpenGLBuffers(m_sponza);
@@ -144,7 +147,6 @@ void NavMesh::onDestroy()
 	// clean up anything we created
 	Gizmos::destroy();
 }
-
 // main that controls the creation/destruction of an application
 int main(int argc, char* argv[])
 {
@@ -159,7 +161,6 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
 void NavMesh::createOpenGLBuffers(FBXFile* a_fbx)
 {
 	// create the GL VAO/VBO/IBO data for meshes
@@ -194,7 +195,6 @@ void NavMesh::createOpenGLBuffers(FBXFile* a_fbx)
 		mesh->m_userData = glData;
 	}
 }
-
 void NavMesh::cleanupOpenGLBuffers(FBXFile* a_fbx)
 {
 	// bind our vertex array object and draw the mesh
@@ -270,3 +270,24 @@ void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 		}
 	}
 }
+void NavMesh::Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed, NavNode* _Start, NavNode* _End)
+{
+	NavNode *CurrentNode;
+	_Open = m_Graph;
+	for (int i=0;i<_Open.size();++i)
+	{
+		_Open[i]->Score = glm::length(_Open[i]->Position) - glm::length(_End->Position);
+	}										
+	std::sort(_Open.begin(), _Open.end(), Compare());
+	do{
+		CurrentNode = _Open[0];
+		_Closed.emplace_back(CurrentNode);
+		CurrentNode->Parent=_Closed.back();
+	}while (CurrentNode != _End);
+	PathList.emplace_back(CurrentNode);
+	do{
+		PathList.emplace_back(CurrentNode->Parent);
+		CurrentNode = CurrentNode->Parent;
+	}while (CurrentNode->Parent != _Start);
+}
+
