@@ -31,7 +31,7 @@ protected:
 
 	};
 
-	std::vector <NavNode*> m_Graph, Open, Closed, PathList;
+	std::vector <NavNode*> m_Graph,/* Open, Closed,*/ PathList;
 
 struct Compare
 {
@@ -40,7 +40,8 @@ struct Compare
 		return (_Node1->Score<_Node2->Score);
 	}
 };
-	void Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed, NavNode* _Start, NavNode* _End);
+	NavNode GetCurrentNode(glm::vec3 _Pos);
+	void Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed);//, NavNode* _Start, NavNode* _End);
 
 	void BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph);
 

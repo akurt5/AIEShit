@@ -54,7 +54,7 @@ bool NavMesh::onCreate(int a_argc, char* a_argv[])
 	
 	//Closed.emplace_back(Open[3]);
 	//delete Open[3];
-	Path(Open, Closed, Open[3], Open[4]);
+	//Path(Open, Closed);//, Open[3], Open[4]);
 
 	return true;
 }
@@ -79,6 +79,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 						 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
 	}
 
+	
 	for (auto node : m_Graph)
 	{
 		Gizmos::addAABBFilled(node->Position, glm::vec3(0.05f), glm::vec4(1, 0, 0, 1));
@@ -110,6 +111,16 @@ void NavMesh::onDraw()
 	glm::mat4 viewMatrix = glm::inverse( m_cameraMatrix );
 
 	glUseProgram(m_shader);
+
+	/*Shader.send("NAME","m4x4",m4x4);
+
+	switch(type){
+	case "m4x4":
+
+		DO MATRIX CRAP
+
+			break;
+	}*/
 
 	int location = glGetUniformLocation(m_shader, "projectionView");
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( m_projectionMatrix * viewMatrix ));
@@ -270,24 +281,38 @@ void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 		}
 	}
 }
-void NavMesh::Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed, NavNode* _Start, NavNode* _End)
+NavMesh::NavNode NavMesh::GetCurrentNode(glm::vec3 _Pos)
 {
-	NavNode *CurrentNode;
-	_Open = m_Graph;
-	for (int i=0;i<_Open.size();++i)
+	const int size = (const int )m_Graph.size();
+	float *Dist = new float[size];
+	for (auto start : m_Graph)
 	{
-		_Open[i]->Score = glm::length(_Open[i]->Position) - glm::length(_End->Position);
+
+	}
+}
+void NavMesh::Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed)//, NavNode* _Start, NavNode* _End)
+{
+
+	NavNode *CurrentNode; 
+	NavNode *Startnode = _Open[2];
+	NavNode *Endnode = _Open[5];
+	std::vector<NavNode*> Open = m_Graph;
+
+
+	/*for (int i=0;i<_Open.size();++i)
+	{
+		_Open[i]->Score = glm::length(_Open[i]->Position) - glm::length(Endnode->Position);
 	}										
 	std::sort(_Open.begin(), _Open.end(), Compare());
 	do{
 		CurrentNode = _Open[0];
 		_Closed.emplace_back(CurrentNode);
 		CurrentNode->Parent=_Closed.back();
-	}while (CurrentNode != _End);
+	}while (CurrentNode != Endnode);
 	PathList.emplace_back(CurrentNode);
 	do{
 		PathList.emplace_back(CurrentNode->Parent);
 		CurrentNode = CurrentNode->Parent;
-	}while (CurrentNode->Parent != _Start);
+	}while (CurrentNode->Parent != Startnode);*/
 }
 
