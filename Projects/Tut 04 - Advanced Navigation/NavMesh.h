@@ -39,9 +39,18 @@ struct Compare
 	{
 		return (_Node1->Score<_Node2->Score);
 	}
+
 };
 	NavNode GetCurrentNode(glm::vec3 _Pos);
 	void Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed);//, NavNode* _Start, NavNode* _End);
+
+	int ScoreCompare (int _NodeA, int _NodeB)
+	{
+		if(_NodeA < _NodeB)
+			return _NodeA;
+		else 
+			return _NodeB;
+	}
 
 	void BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph);
 
