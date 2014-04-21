@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
+#include "FBX_Class.h"
 
 
 // Derived application class that wraps up all globals neatly

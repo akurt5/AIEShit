@@ -65,15 +65,15 @@ void Advanced_Texturing::onUpdate(float a_deltaTime)
 						 i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
 	}
 
-	// quit our application when escape is pressed
+	//quit our application when escape is pressed
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		quit();
 
-	if (glfwGetKey(m_window,GLFW_KEY_LEFT) == GLFW_PRESS) Mesh->m_decayValue -= a_deltaTime;
-	if (glfwGetKey(m_window,GLFW_KEY_RIGHT) == GLFW_PRESS) Mesh->m_decayValue += a_deltaTime;
+	//																			if (glfwGetKey(m_window,GLFW_KEY_LEFT) == GLFW_PRESS) Mesh->m_decayValue -= a_deltaTime;
+	//																			if (glfwGetKey(m_window,GLFW_KEY_RIGHT) == GLFW_PRESS) Mesh->m_decayValue += a_deltaTime;
 
-	if( Mesh->m_decayValue < 0.0f) Mesh->m_decayValue = 0.0f;
-	if( Mesh->m_decayValue > 1.0f) Mesh->m_decayValue = 1.0f;
+	//																			if( Mesh->m_decayValue < 0.0f) Mesh->m_decayValue = 0.0f;
+	//																			if( Mesh->m_decayValue > 1.0f) Mesh->m_decayValue = 1.0f;
 	
 	Mesh->Update(Shader);
 }
@@ -89,14 +89,14 @@ void Advanced_Texturing::onDraw()
 	// draw the gizmos from this frame
 	Gizmos::draw(viewMatrix, m_projectionMatrix);
 
-	Mesh->Draw(viewMatrix, m_projectionMatrix);
+	Mesh->Draw(viewMatrix, m_projectionMatrix, Shader);
 }
 
 void Advanced_Texturing::onDestroy()
 {
 	// clean up anything we created
 	Gizmos::destroy();
-	Mesh.Unload();
+	//Mesh.Unload();
 }
 
 // main that controls the creation/destruction of an application

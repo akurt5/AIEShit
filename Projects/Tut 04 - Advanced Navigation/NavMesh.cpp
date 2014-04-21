@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtx/norm.hpp>
 #include <algorithm>
 
 #define DEFAULT_SCREENWIDTH 1280
@@ -43,6 +44,10 @@ bool NavMesh::onCreate(int a_argc, char* a_argv[])
 //	createOpenGLBuffers(m_navMesh);
 
 	BuildNavMesh(m_navMesh->getMeshByIndex(0), m_Graph);
+	
+	Agent1.Load(glm::vec3(4, 0, 2));
+	Path(GetCurrentNode(glm::vec3(4, 0, 2)));
+	
 
 	unsigned int vs = Utility::loadShader("../../Build/shaders/sponza.vert", GL_VERTEX_SHADER);
 	unsigned int fs = Utility::loadShader("../../Build/shaders/sponza.frag", GL_FRAGMENT_SHADER);
@@ -101,6 +106,8 @@ void NavMesh::onUpdate(float a_deltaTime)
 	// quit our application when escape is pressed
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		quit();
+
+
 }
 void NavMesh::onDraw() 
 {
@@ -281,64 +288,105 @@ void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 		}
 	}
 }
-NavMesh::NavNode NavMesh::GetCurrentNode(glm::vec3 _Pos)
+NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
 {
-	
+	printf("Get Current Node Start\n");
+	NavNode *Closest = m_Graph.front();
+	NavNode *Endnode = m_Graph.back();
+	//																			Determine the score for each node
+	for (int i=0;i<m_Graph.size();i++)
+	{
+		m_Graph[i]->Score = (glm::length(m_Graph[i]->Position) - glm::length(Endnode->Position));
+		if(m_Graph[i]->Score < 0)
+		{m_Graph[i]->Score *= -1;}
+	}
+
 	for (int i=0;i<m_Graph.size();++i)
 	{
-		NavNode Closest;
-		if( ScoreCompare(m_Graph[i]->Score, 
+		
+		Closest = ScoreCompare(m_Graph[i], Closest);
 	}
+	printf("Get Current Node End\n");
+
+	return Closest;
 }
-void NavMesh::Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed)//, NavNode* _Start, NavNode* _End)
+void NavMesh::Path( NavNode* _Startnode)
 {
+	printf("Path Start\n");
+
+	//GetCurrentNode(_Startnode->Position);
+
 	//																			Start and End nodes are determined
-	NavNode *Startnode = m_Graph[2];
+	//NavNode *Startnode = m_Graph[2];
 	NavNode *Endnode = m_Graph[5];
 	//																			CurrentNode is our iterator
-	NavNode *CurrentNode = Startnode; //										GetCurrent Node.
+	NavNode *CurrentNode = _Startnode; //										GetCurrent Node.
 
-	//																			Determine the score for each node
-	for (int i=0;i<m_Graph.size();++i)
-	{
-		m_Graph[i]->Score = glm::length(m_Graph[i]->Position) - glm::length(Endnode->Position);
-	}
+	
 
 	//																			Startnode is added to open
 	std::vector<NavNode*> Open(1, CurrentNode);
 
 	//																			The Startnode is added to the closed list
 	std::vector<NavNode*> Closed;
-	do{ //																			while we havent found the end chose the shortest path
+	printf("Path Top of first DO\n");
+
+	do{ //		   																	while we havent found the end chose the shortest path
 		//																			Adds current node to the back of the vector for easy access
-		Closed.emplace_back(CurrentNode);
-		for (auto start : CurrentNode->edgeTarget)
+		//if (CurrentNode != Endnode)
+		//{
+			Closed.emplace_back(CurrentNode);
+		//}
+		//else
+		//	continue;//											good enough fo now
+		for (int i=0;i<3;++i)
 		{
-			Open.push_back(start);
+			if(CurrentNode->edgeTarget[i] != nullptr)
+			{
+				int check = 0;
+				for (int a=0;a<Closed.size();a++)
+				{
+					
+					if(CurrentNode->edgeTarget[i] != Closed[a])
+					{
+						check ++;
+					}
+					if (check == Closed.size())
+					{
+						Open.push_back(CurrentNode->edgeTarget[i]);
+					}
+				}
+			}
 		}
+		//																			Set parent as back of closed list
+		CurrentNode->Parent = Closed.back();
+
+		Open.erase(Open.begin());
 		//																			Determine which of the neighbouring nodes has the lowest score
 		//												/*Old Codes*/				CurrentNode = ScoreCompare(CurrentNode->edgeTarget[0], ScoreCompare(CurrentNode->edgeTarget[1], CurrentNode->edgeTarget[2]));
 		
-		
 		//																			Sort Open based on score
-		std::sort(_Open.begin(), _Open.end(), Compare());
+		std::sort(Open.begin(), Open.end(), Compare());
+		CurrentNode = Open[0];
+		
 
-				
-		//																			Set parent as back of closed list
-		CurrentNode->Parent = Closed.back();
+
+		
 	}while(CurrentNode != Endnode);
 
 	//																			Create a vector to store the path
 	std::vector<NavNode*> PathList;
+	printf("Path Top of second DO\n");
+
 	do{
 		//																			Adds the parents of the path items in reverse order or something so the list is in the correct order
 		PathList.emplace(PathList.begin(), CurrentNode);
 		//																			current node becomes the parent to do the whole iteration thing
 		CurrentNode = CurrentNode->Parent;
 		//																			do all that until the path gets back to the start
-	}while(CurrentNode->Parent != Startnode);
+	}while(CurrentNode->Parent != _Startnode);
+	printf("Path End\n");
 	
 }
 	
-
 

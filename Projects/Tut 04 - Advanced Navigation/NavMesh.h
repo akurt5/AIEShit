@@ -1,12 +1,30 @@
 #ifndef __NavMesh_H_
 #define __NavMesh_H_
 
+#include <Gizmos.h>
 #include "Application.h"
 #include <glm/glm.hpp>
+#include <iostream>
 
 #include <FBXFile.h>
 
+class Agent
+{
+public:
 
+	void Load(glm::vec3 _Position)
+	{
+		Position = _Position;
+		Gizmos::addSphere(_Position, 4, 5, 1, glm::vec4(1, 0, 1, 0));
+	}
+	void Update()
+	{
+		Gizmos::addSphere(Position, 4, 5, 1, glm::vec4(1, 0, 1, 0));
+	}
+
+	glm::vec3 Position;
+
+};
 
 // Derived application class that wraps up all globals neatly
 class NavMesh : public Application
@@ -40,19 +58,21 @@ struct Compare
 		return (_Node1->Score<_Node2->Score);
 	}
 
-};
-	NavNode GetCurrentNode(glm::vec3 _Pos);
-	void Path(std::vector<NavNode*> &_Open, std::vector<NavNode*> &_Closed);//, NavNode* _Start, NavNode* _End);
 
-	int ScoreCompare (int _NodeA, int _NodeB)
+};
+	NavNode* GetCurrentNode(glm::vec3 _Pos);
+	void Path( NavNode* _Startnode);
+
+	NavNode* ScoreCompare (NavNode *_NodeA, NavNode *_NodeB)
 	{
-		if(_NodeA < _NodeB)
+		if(_NodeA->Score <= _NodeB->Score)
 			return _NodeA;
 		else 
 			return _NodeB;
 	}
 
 	void BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph);
+
 
 	void	createOpenGLBuffers(FBXFile* a_fbx);
 	void	cleanupOpenGLBuffers(FBXFile* a_fbx);
@@ -71,6 +91,8 @@ struct Compare
 	glm::mat4	m_projectionMatrix;
 
 	int Start, End;
+
+	Agent Agent1;
 };
 
 #endif // __NavMesh_H_
