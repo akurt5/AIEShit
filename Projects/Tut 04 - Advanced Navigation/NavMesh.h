@@ -8,23 +8,6 @@
 
 #include <FBXFile.h>
 
-class Agent
-{
-public:
-
-	void Load(glm::vec3 _Position)
-	{
-		Position = _Position;
-		Gizmos::addSphere(_Position, 4, 5, 1, glm::vec4(1, 0, 1, 0));
-	}
-	void Update()
-	{
-		Gizmos::addSphere(Position, 4, 5, 1, glm::vec4(1, 0, 1, 0));
-	}
-
-	glm::vec3 Position;
-
-};
 
 // Derived application class that wraps up all globals neatly
 class NavMesh : public Application
@@ -49,7 +32,7 @@ protected:
 
 	};
 
-	std::vector <NavNode*> m_Graph,/* Open, Closed,*/ PathList;
+	std::vector <NavNode*> m_Graph, Open, Closed, PathList;
 
 struct Compare
 {
@@ -61,11 +44,12 @@ struct Compare
 
 };
 	NavNode* GetCurrentNode(glm::vec3 _Pos);
-	void Path( NavNode* _Startnode);
+	void Path(glm::vec3 _StartPos, glm::vec3 _TargetPos);
+	void Pathtest(int _counter);
 
 	NavNode* ScoreCompare (NavNode *_NodeA, NavNode *_NodeB)
 	{
-		if(_NodeA->Score <= _NodeB->Score)
+		if(_NodeA->Score < _NodeB->Score)
 			return _NodeA;
 		else 
 			return _NodeB;
@@ -90,9 +74,8 @@ struct Compare
 	glm::mat4	m_cameraMatrix;
 	glm::mat4	m_projectionMatrix;
 
-	int Start, End;
-
-	Agent Agent1;
+	int Start, End, count;
+	bool down;
 };
 
 #endif // __NavMesh_H_
