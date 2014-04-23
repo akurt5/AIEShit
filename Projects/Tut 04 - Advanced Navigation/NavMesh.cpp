@@ -56,7 +56,7 @@ bool NavMesh::onCreate(int a_argc, char* a_argv[])
 	//Closed.emplace_back(Open[3]);
 	//delete Open[3];
 	//Path(Open, Closed);//, Open[3], Open[4]);
-	Path(glm::vec3(2, 0, 2), glm::vec3(10, 0, 2));
+	
 	count = 0;
 
 	return true;
@@ -126,6 +126,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 		count = 0;
 	}
 	Pathtest(count);
+	Path(glm::vec3(2, 0, 2), glm::vec3(10, 0, 2));
 
 }
 void NavMesh::onDraw() 
@@ -324,6 +325,19 @@ NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
 	}
 	//sort list of nodes based on score
 	std::sort(m_Graph.begin(), m_Graph.end(), Compare());
+	for(int i=0;i<m_Graph.size();i++)
+	{
+		for(int a=0;a<m_Graph.size();a++)
+	{
+			if(m_Graph[i]->Position == m_Graph[a]->Position)
+			{
+				if(i != a)
+				{
+					m_Graph.erase(m_Graph.erase(m_Graph.begin()+(i)));
+				}
+			}
+		}
+	}
 	// :. list[0] must be current node
 	return m_Graph[0];
 	/*printf("Get Current Node Start\n");
@@ -346,10 +360,10 @@ NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
 
 	return Closest;*/
 }
-void NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _TargetPos)
+std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _TargetPos)
 {
-	NavNode *CurrentNode = GetCurrentNode(_StartPos);
-	NavNode *EndNode = GetCurrentNode(_TargetPos);
+	CurrentNode = GetCurrentNode(_StartPos);
+	EndNode = GetCurrentNode(_TargetPos);
 
 	CurrentNode->Parent = nullptr;
 	do{
@@ -359,49 +373,71 @@ void NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _TargetPos)
 		{
 			if(CurrentNode->edgeTarget[i] != nullptr)
 			{
+				bool Allg = true;
 				for ( auto iterator : Closed)
 				{
-					if(CurrentNode->edgeTarget[0] != iterator)
+					if(Allg)
 					{
-						continue;
+						if(CurrentNode->edgeTarget[i]->Position != iterator->Position)
+						{
+							Allg = true;
+						}
+						else
+						{
+							Allg = false;
+						}
 					}
-					else
-					{
-						break;
-					}
-						Open.emplace_back(CurrentNode->edgeTarget[i]);
-						CurrentNode->edgeTarget[i]->Parent = CurrentNode;
 				}
-				/*for ( auto iterator : Open)
+				if(Closed.size() == 0){Allg = true;}
+				for ( auto iterator : Open)
 				{
-					if(CurrentNode->edgeTarget[0] != iterator)
+					if (Allg)
 					{
-						continue;
+						if(CurrentNode->edgeTarget[i]->Position != iterator->Position)
+						{
+							Allg = true;
+						}
+						else
+						{
+							Allg = false;
+						}
 					}
-					else
-					{
-						break;
-					}
-						Open.emplace_back(CurrentNode->edgeTarget[i]);
-						CurrentNode->edgeTarget[i]->Parent = CurrentNode;
-				}*/
+				}
+				if (Allg)
+				{
+					Open.emplace_back(CurrentNode->edgeTarget[i]);
+					CurrentNode->edgeTarget[i]->Parent = CurrentNode;
+				}
 			}		
 		}
-		Closed.emplace_back(CurrentNode);
+		
+		//																			attempt at cleaning the closed list and preventing duplicates
+		for (auto Iterator : Closed )
+		{
+			if(Iterator->Position != CurrentNode->Position)
+			{
+				Closed.emplace_back(CurrentNode);
+			}
+		}
+
 		Open.erase(Open.begin());
 
 		CurrentNode = ScoreCompare(CurrentNode->edgeTarget[0], ScoreCompare(CurrentNode->edgeTarget[1], CurrentNode->edgeTarget[2]));
 
-	}while(CurrentNode != EndNode);
+	}while(CurrentNode->Position != EndNode->Position);
 
 	PathList.emplace_back(CurrentNode);
 
 	do{
-		
-		PathList.emplace_back(CurrentNode->Parent);
+		PathList.emplace(PathList.begin(), CurrentNode->Parent);
 		CurrentNode = CurrentNode->Parent;
-
 	}while(CurrentNode->Parent != nullptr);
+
+	for (int i=0;i<PathList.size();i++)
+	{
+		Gizmos::addTri(PathList[i]->Vertices[0].xyz, PathList[i]->Vertices[1].xyz, PathList[i]->Vertices[3].xyz, glm::vec4(0.8, 0, 0.8, 1));
+	}
+	return PathList;
 }
 /*{
 	printf("Path Start\n");

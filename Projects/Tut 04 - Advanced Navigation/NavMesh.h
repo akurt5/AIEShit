@@ -44,11 +44,18 @@ struct Compare
 
 };
 	NavNode* GetCurrentNode(glm::vec3 _Pos);
-	void Path(glm::vec3 _StartPos, glm::vec3 _TargetPos);
+	std::vector <NavNode*> Path(glm::vec3 _StartPos, glm::vec3 _TargetPos);
 	void Pathtest(int _counter);
 
 	NavNode* ScoreCompare (NavNode *_NodeA, NavNode *_NodeB)
 	{
+		if(_NodeA == nullptr)
+		{
+			return _NodeB;
+		}if(_NodeB == nullptr)
+		{
+			return _NodeA;
+		}
 		if(_NodeA->Score < _NodeB->Score)
 			return _NodeA;
 		else 
@@ -76,6 +83,8 @@ struct Compare
 
 	int Start, End, count;
 	bool down;
+
+	NavNode *CurrentNode, *EndNode;
 };
 
 #endif // __NavMesh_H_
