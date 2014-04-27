@@ -309,11 +309,26 @@ void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 			}
 		}
 	}
+
+	//																			get rid of useless naode / any nodes with the same position
+	for(int i=0;i<a_Graph.size();i++)
+	{
+		for(int a=0;a<a_Graph.size();a++)
+	{
+			if(a_Graph[i]->Position == a_Graph[a]->Position)
+			{
+				if(i != a)
+				{
+					a_Graph.erase(a_Graph.erase(a_Graph.begin()+(i)));
+				}
+			}
+		}
+	}
 }
 NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
 {
 	//get current node / assign scores based on pos from start node
-	for (int i=0;i<m_Graph.size();++i)
+	/*for (int i=0;i<m_Graph.size();++i)
 	{
 		m_Graph[i]->Score = (glm::length(_Pos) - glm::length(m_Graph[i]->Position));
 		
@@ -322,22 +337,10 @@ NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
 			m_Graph[i]->Score *= -1;
 		}
 		//std::cout<<m_Graph[i]->Score<<"   "<<m_Graph[i]<<'\n';
-	}
-	//sort list of nodes based on score
-	std::sort(m_Graph.begin(), m_Graph.end(), Compare());
-	for(int i=0;i<m_Graph.size();i++)
-	{
-		for(int a=0;a<m_Graph.size();a++)
-	{
-			if(m_Graph[i]->Position == m_Graph[a]->Position)
-			{
-				if(i != a)
-				{
-					m_Graph.erase(m_Graph.erase(m_Graph.begin()+(i)));
-				}
-			}
-		}
-	}
+	}*/
+	//																			sort list of nodes based on score
+	//std::sort(m_Graph.begin(), m_Graph.end(), Compare());
+	
 	// :. list[0] must be current node
 	return m_Graph[0];
 	/*printf("Get Current Node Start\n");
@@ -362,12 +365,17 @@ NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
 }
 std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _TargetPos)
 {
+	
 	CurrentNode = GetCurrentNode(_StartPos);
 	EndNode = GetCurrentNode(_TargetPos);
 
 	CurrentNode->Parent = nullptr;
-	do{
+	//do{
+	/*if(CurrentNode->Position != EndNode->Position)
+	{
 		Open.emplace_back(CurrentNode);
+	}
+		
 
 		for(int i=0;i<3;i++)
 		{
@@ -437,7 +445,8 @@ std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _Ta
 	{
 		Gizmos::addTri(PathList[i]->Vertices[0].xyz, PathList[i]->Vertices[1].xyz, PathList[i]->Vertices[3].xyz, glm::vec4(0.8, 0, 0.8, 1));
 	}
-	return PathList;
+	return PathList;*/
+	return m_Graph;
 }
 /*{
 	printf("Path Start\n");
@@ -554,4 +563,6 @@ void NavMesh::Pathtest(int _counter)
 				       glm::vec3(m_Graph[_counter]->edgeTarget[2]->Vertices[1].x, m_Graph[_counter]->edgeTarget[2]->Vertices[1].y + 0.5f, m_Graph[_counter]->edgeTarget[2]->Vertices[1].z), 
 				       glm::vec3(m_Graph[_counter]->edgeTarget[2]->Vertices[2].x, m_Graph[_counter]->edgeTarget[2]->Vertices[2].y + 0.5f, m_Graph[_counter]->edgeTarget[2]->Vertices[2].z), glm::vec4(0, 0, 1, 0.5));
 	}
+	std::cout<<_counter<<"  "<<m_Graph[_counter]<<'\n';
+	//																			system("cls");
 }
