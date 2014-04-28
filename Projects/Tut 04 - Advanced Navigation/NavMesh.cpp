@@ -385,13 +385,14 @@ std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _Ta
 				{
 					if(Allg)
 					{
-						if(CurrentNode->edgeTarget[i]->Position != iterator->Position)
+						if((CurrentNode->edgeTarget[i]->Position != iterator->Position)&&(CurrentNode->edgeTarget[i] != iterator))
 						{
 							Allg = true;
 						}
 						else
 						{
 							Allg = false;
+							break;
 						}
 					}
 				}
@@ -400,13 +401,14 @@ std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _Ta
 				{
 					if (Allg)
 					{
-						if(CurrentNode->edgeTarget[i]->Position != iterator->Position)
+						if((CurrentNode->edgeTarget[i]->Position != iterator->Position)&&(CurrentNode->edgeTarget[i] != iterator))
 						{
 							Allg = true;
 						}
 						else
 						{
 							Allg = false;
+							break;
 						}
 					}
 				}
