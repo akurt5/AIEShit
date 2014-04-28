@@ -43,7 +43,7 @@ bool NavMesh::onCreate(int a_argc, char* a_argv[])
 	m_navMesh->load("../../Build/models/SponzaSimpleNavMesh.fbx", FBXFile::UNITS_CENTIMETER);
 //	createOpenGLBuffers(m_navMesh);
 
-	BuildNavMesh(m_navMesh->getMeshByIndex(0), m_Graph);	
+	BuildNavMesh(m_navMesh->getMeshByIndex(0), m_Graph, glm::vec3(5,0,-6), glm::vec3(3,0,5));	
 	
 
 	unsigned int vs = Utility::loadShader("../../Build/shaders/sponza.vert", GL_VERTEX_SHADER);
@@ -52,10 +52,6 @@ bool NavMesh::onCreate(int a_argc, char* a_argv[])
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	
-	//Closed.emplace_back(Open[3]);
-	//delete Open[3];
-	//Path(Open, Closed);//, Open[3], Open[4]);
 	
 	count = 0;
 
@@ -125,8 +121,19 @@ void NavMesh::onUpdate(float a_deltaTime)
 	{
 		count = 0;
 	}
-	Pathtest(count);
+	//Pathtest(count);
 	Path(glm::vec3(2, 0, 2), glm::vec3(10, 0, 2));
+
+	if(PathList.size()>0)
+	{
+		for(int i=0;i<PathList.size();++i)
+		{
+			Gizmos::addTri(PathList[i]->Vertices[0],PathList[i]->Vertices[1], PathList[i]->Vertices[2], glm::vec4(0, 0.2, 0, 1));
+		}
+	}
+
+	Gizmos::addTri(StartNode->Vertices[0],StartNode->Vertices[1], StartNode->Vertices[2], glm::vec4(0, 0.2, 0, 1));
+	Gizmos::addTri(EndNode->Vertices[0],EndNode->Vertices[1], EndNode->Vertices[2], glm::vec4(0.2, 0, 0, 1));
 
 }
 void NavMesh::onDraw() 
@@ -151,7 +158,7 @@ void NavMesh::onDraw()
 
 	int location = glGetUniformLocation(m_shader, "projectionView");
 	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( m_projectionMatrix * viewMatrix ));
-	if (!glfwGetKey(m_window, GLFW_KEY_SPACE))
+	if (glfwGetKey(m_window, GLFW_KEY_SPACE))
 	{
 		unsigned int count = m_sponza->getMeshCount();
 		for (unsigned int i = 0 ; i < count ; ++i )
@@ -253,8 +260,9 @@ void NavMesh::cleanupOpenGLBuffers(FBXFile* a_fbx)
 
 	
 }
-void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
+void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph, glm::vec3 _StartPos, glm::vec3 _EndPos)
 {
+
 	unsigned int tricount = a_Mesh->m_indices.size() / 3;
 
 	for (unsigned int tri=0; tri<tricount; ++tri)
@@ -310,7 +318,7 @@ void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 		}
 	}
 
-	//																			get rid of useless naode / any nodes with the same position
+	//																			get rid of useless nodes / any nodes with the same position
 	for(int i=0;i<a_Graph.size();i++)
 	{
 		for(int a=0;a<a_Graph.size();a++)
@@ -324,63 +332,54 @@ void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 			}
 		}
 	}
-}
-NavMesh::NavNode* NavMesh::GetCurrentNode(glm::vec3 _Pos)
-{
-	//get current node / assign scores based on pos from start node
-	/*for (int i=0;i<m_Graph.size();++i)
+
+	//																			Calculate score to a position (startnode) to find the node closest to the position.	
+	for (int i=0;i<a_Graph.size();++i)
 	{
-		m_Graph[i]->Score = (glm::length(_Pos) - glm::length(m_Graph[i]->Position));
+		a_Graph[i]->Score = (glm::length(_StartPos) - glm::length(a_Graph[i]->Position));
 		
-		if(m_Graph[i]->Score < 0)
+		if(a_Graph[i]->Score < 0)
 		{
-			m_Graph[i]->Score *= -1;
+			a_Graph[i]->Score *= -1;
 		}
-		//std::cout<<m_Graph[i]->Score<<"   "<<m_Graph[i]<<'\n';
-	}*/
+	}
+	std::sort(a_Graph.begin(), a_Graph.end(), Compare());
+
+	StartNode = a_Graph[0];
+
 	//																			sort list of nodes based on score
-	//std::sort(m_Graph.begin(), m_Graph.end(), Compare());
-	
-	// :. list[0] must be current node
-	return m_Graph[0];
-	/*printf("Get Current Node Start\n");
-	NavNode *Closest = m_Graph[30];
-	NavNode *Endnode = m_Graph.back();
-	//																			Determine the score for each node
-	for (int i=0;i<m_Graph.size();i++)
-	{
-		m_Graph[i]->Score = (glm::length(m_Graph[i]->Position) - glm::length(Endnode->Position));
-		if(m_Graph[i]->Score < 0)
-		{m_Graph[i]->Score *= -1;}
-	}
 
-	for (int i=0;i<m_Graph.size();++i)
+	for (int i=0;i<a_Graph.size();++i)
 	{
+		a_Graph[i]->Score = (glm::length(_EndPos) - glm::length(a_Graph[i]->Position));
 		
-		Closest = ScoreCompare(m_Graph[i], Closest);
+		if(a_Graph[i]->Score < 0)
+		{
+			a_Graph[i]->Score *= -1;
+		}
 	}
-	printf("Get Current Node End\n");
-
-	return Closest;*/
+	//																			sort list of nodes based on score
+	std::sort(a_Graph.begin(), a_Graph.end(), Compare());
+	
+	//																			:. list[0] must be current node
+	EndNode = a_Graph[0];
+	CurrentNode = StartNode;
+	CurrentNode->Parent = nullptr;
 }
+
 std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _TargetPos)
 {
-	
-	CurrentNode = GetCurrentNode(_StartPos);
-	EndNode = GetCurrentNode(_TargetPos);
-
-	CurrentNode->Parent = nullptr;
-	//do{
-	/*if(CurrentNode->Position != EndNode->Position)
-	{
-		Open.emplace_back(CurrentNode);
-	}
-		
+	Gizmos::addTri(CurrentNode->Vertices[0], CurrentNode->Vertices[1], CurrentNode->Vertices[2], glm::vec4(1, 1, 1, 1));
+	//if((CurrentNode->Position != EndNode->Position) && (PathList.size() < 1))
+	do{
+		Open.emplace_back(CurrentNode);		
 
 		for(int i=0;i<3;i++)
 		{
 			if(CurrentNode->edgeTarget[i] != nullptr)
 			{
+				Gizmos::addTri(CurrentNode->edgeTarget[i]->Vertices[0], CurrentNode->edgeTarget[i]->Vertices[1], CurrentNode->edgeTarget[i]->Vertices[2], glm::vec4(1, 0, 0, 1));
+
 				bool Allg = true;
 				for ( auto iterator : Closed)
 				{
@@ -431,22 +430,21 @@ std::vector <NavMesh::NavNode*> NavMesh::Path(glm::vec3 _StartPos, glm::vec3 _Ta
 		Open.erase(Open.begin());
 
 		CurrentNode = ScoreCompare(CurrentNode->edgeTarget[0], ScoreCompare(CurrentNode->edgeTarget[1], CurrentNode->edgeTarget[2]));
+		Gizmos::addTri(Open[1]->Vertices[0], Open[1]->Vertices[1], Open[1]->Vertices[2], glm::vec4(0, 0, 1, 1));
 
 	}while(CurrentNode->Position != EndNode->Position);
+	//else
+	//{
 
-	PathList.emplace_back(CurrentNode);
+		PathList.emplace_back(CurrentNode);
 
-	do{
-		PathList.emplace(PathList.begin(), CurrentNode->Parent);
-		CurrentNode = CurrentNode->Parent;
-	}while(CurrentNode->Parent != nullptr);
+		do{
+			PathList.emplace(PathList.begin(), CurrentNode->Parent);
+			CurrentNode = CurrentNode->Parent;
+		}while((CurrentNode->Parent != nullptr) || (CurrentNode->Parent->Position != StartNode->Position));
+	//}
 
-	for (int i=0;i<PathList.size();i++)
-	{
-		Gizmos::addTri(PathList[i]->Vertices[0].xyz, PathList[i]->Vertices[1].xyz, PathList[i]->Vertices[3].xyz, glm::vec4(0.8, 0, 0.8, 1));
-	}
-	return PathList;*/
-	return m_Graph;
+	return PathList;
 }
 /*{
 	printf("Path Start\n");

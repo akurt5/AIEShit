@@ -43,7 +43,7 @@ struct Compare
 
 
 };
-	NavNode* GetCurrentNode(glm::vec3 _Pos);
+	//NavNode* GetCurrentNode(glm::vec3 _Pos, std::vector<NavNode*> &_List);
 	std::vector <NavNode*> Path(glm::vec3 _StartPos, glm::vec3 _TargetPos);
 	void Pathtest(int _counter);
 
@@ -62,7 +62,7 @@ struct Compare
 			return _NodeB;
 	}
 
-	void BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph);
+	void BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph, glm::vec3 _StartPos, glm::vec3 _EndPos);
 
 
 	void	createOpenGLBuffers(FBXFile* a_fbx);
@@ -84,7 +84,7 @@ struct Compare
 	int Start, End, count;
 	bool down;
 
-	NavNode *CurrentNode, *EndNode;
+	NavNode *CurrentNode, *EndNode, *StartNode;
 };
 
 #endif // __NavMesh_H_
