@@ -14,33 +14,45 @@ public:
  
 	//																			add '...' to allow multiple enemies, or add a list. List is probably better.
 	//Agent(){Timer = 0;Attack = false;}
-	Agent(std::vector <NavNode*> _Nodes){Timer = 0;Attack = false;Nodes = _Nodes;}
+	Agent(std::vector <NavNode*> _Nodes)
+	{
+		Timer = 0;
+		Attack = false;
+		Nodes = _Nodes;
+		RandColour.x = (rand()%100);
+		RandColour.x /=100;
+		RandColour.y = (rand()%100);
+		RandColour.y /=100;
+		RandColour.z = (rand()%100);
+		RandColour.z /=100;
+		RandColour.w = 1;
+	}
 	virtual ~Agent (){}
 
-	const glm::vec3& GetPos () const {return Position;}
+	const glm::vec3& GetPos () const {return AgentPosition;}
 
 	const glm::vec3 GetTarget () const{return Target;}
 	void CalcEnemy(std::vector <Agent*> _Team){Enemies = _Team;}
-	void SetPos (const glm::vec3& _Pos) { Position = _Pos;}
+	void SetPos (const glm::vec3& _Pos) { AgentPosition = _Pos;}
 	void SetTarget (glm::vec3 _Target) { Target = _Target;}
-	void Move(float t)
+	void SetTeam (char *_NewTeam){MyTeam = _NewTeam;}
+	void FollowPath(float _DeltaTime)
 	{
-		glm::vec3 Dest = GetTarget();
-		glm::vec3 Pos = Position;
-		if (Path.size() >= 2)
+		glm::vec3 Dest = Path[0]->Position;
+		glm::vec3 Pos = AgentPosition;
+		if(glm::length(Path[0]->Position) - glm::length(AgentPosition) < 0.01f)
 		{
-			Dest = Path[1]->Position;
-			float t1 = 1-t;			
-			Dest = t1 * ((t1 * Position) + (t * Path[0]->Position)) + t * ((t1 * Path[0]->Position) + (t * Path[1]->Position));
+			//std::cout<<"Erased \n";
+			//Path.erase(Path.begin());
 		}
-	
-			//	for now i will just normalise there
-			//	Interpolate linearly to find the third vector // use a number greater than 1 as time // then spline
-		if(Dest.x != 0 && Dest.z != 0)
+		
+			//																			for now i will just normalise there
+			//																			Interpolate linearly to find the third vector // use a number greater than 1 as time // then spline
+		if(Dest.x != NULL)
 		{
 			glm::normalize(Dest);
 		}
-		Velocity += Dest;
+		AgentPosition += Dest * _DeltaTime;
 	}
 	void PathFind(glm::vec3 _EndPos)
 	{
@@ -128,7 +140,7 @@ public:
 		return Temp[0];
 	}
 	void SetBehaviour(Behaviour* _Behaviour) {Behave = _Behaviour;}
-	void update(float _DeltaTime)
+	void update(float _DeltaTime, glm::vec4 _TeamColour)
 	{
 		if(!(bool)Timer){Timer = 1000 * (int)Utility::getDeltaTime(); Attack =!Attack;}
 		else{Timer--;}
@@ -136,16 +148,43 @@ public:
 		if (Behave != nullptr)
 			Behave->Execute(this);
 		if(Path.size() > 0)
-			Move(1.0f);
+		{
+			FollowPath(_DeltaTime);
+		}
 		else
+		{
+			PathFind(GetTarget());
+		}
 		
-		Position += (Velocity * _DeltaTime);
+		if(AgentPosition.x < -		20)	{Velocity.x	+=	0.3;}
+		if(AgentPosition.x >		20)	{Velocity.x	-=	0.3;}
+		if(AgentPosition.y < -		20)	{Velocity.y	+=	0.3;}
+		if(AgentPosition.y >		20)	{Velocity.y	-=	0.3;}
+
+		if(Path.size() > 2)
+			{			
+				glm::vec3 Pos1 = AgentPosition, Pos2 = Path[0]->Position;
+				Gizmos::addLine(Pos1, Pos2, RandColour * _TeamColour);
+				Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), RandColour * _TeamColour);
+
+				for(int a=0;a<Path.size()-1;a++)
+				{
+					Pos1 = Path[a]->Position;
+					Pos2 = Path[a+1]->Position;
+					Gizmos::addLine(Pos1, Pos2, RandColour * _TeamColour);
+					Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), RandColour * _TeamColour);
+
+				}
+				Gizmos::addTri(Path.front()->Vertices[0],Path.front()->Vertices[1], Path.front()->Vertices[2], RandColour * RandColour * _TeamColour);
+				Gizmos::addTri(Path.back()->Vertices[0],Path.back()->Vertices[1], Path.back()->Vertices[2], RandColour * _TeamColour);
+			}
+		
+		
+
+		//AgentPosition += (Velocity * _DeltaTime);
 		Velocity = glm::vec3(0);
-
-			//Gizmos::addTri(StartNode->Vertices[0],StartNode->Vertices[1], StartNode->Vertices[2], glm::vec4(0, 0.2, 0, 1));
-			//Gizmos::addTri(EndNode->Vertices[0],EndNode->Vertices[1], EndNode->Vertices[2], glm::vec4(0.2, 0, 0, 1));
-
 		
+		Gizmos::addAABBFilled(AgentPosition, glm::vec3(0.5f), RandColour * _TeamColour);
 	}
 
 	Behaviour* Behave;
@@ -158,7 +197,9 @@ public:
 
 	bool Attack;
 	int Timer;
-	glm::vec3 Position, Target, Velocity;
+	glm::vec3 AgentPosition, Target, Velocity;
+	glm::vec4 RandColour;
+	char *MyTeam;
 };
 
 class Team
@@ -166,7 +207,7 @@ class Team
 public:
 	Team(){}
 	virtual ~Team(){}
-	void AddMember(std::vector <NavNode*> _Nodes){Members.emplace_back(new Agent(_Nodes));}
+	void AddMember(std::vector <NavNode*> _Nodes, char *_Team){Members.emplace_back(new Agent(_Nodes));Members.back()->SetTeam(_Team);}
 	void DelMember(){Members.erase(Members.begin());}
 	
 	
@@ -180,9 +221,53 @@ public:
 	Flag(){fRed , fGreen, fBlue = 0;}
 	virtual ~Flag(){}
 	glm::vec3 GetPos(){return Position;}
-	void Update(){Gizmos::addAABBFilled(Position, glm::vec3(0.1f), glm::vec4(fRed, fGreen, fBlue, 1));}
+	void Update(Team *_Red, Team *_Blue)
+	{
+		float Rdist = 0, Rdisttemp = 0, Bdist = 0, Bdisttemp = 0;
+		for(auto Guy : _Red->Members)
+		{
+			Rdisttemp = glm::distance(Guy->GetPos(), Position);
+
+			if(Rdist > Rdisttemp)
+			{
+				Rdist = Rdisttemp;
+			}
+		}
+		for(auto Guy : _Blue->Members)
+		{
+			Bdisttemp = glm::distance(Guy->GetPos(), Position);
+			if(Bdist > Bdisttemp)
+			{
+				Bdist = Bdisttemp;
+			}
+		}
+			if((Rdist > Bdist)&&(Bdist < 1))
+			{
+				if(fBlue <1 && fBlue >0)
+				{
+					fBlue += 0.000001;
+				}
+				if(fRed <1 && fRed >0)
+				{
+					fRed -= 0.000001;
+				}
+			}
+			else if((Bdist > Rdist)&&(Rdist < 1))
+			{
+				if(fBlue <1 && fBlue >0)
+				{
+					fBlue -= 0.000001;
+				}
+				if(fRed <1 && fRed >0)
+				{
+					fRed += 0.000001;
+				}
+			}
+		
+		Gizmos::addAABBFilled(Position, glm::vec3(0.1f), glm::vec4(fRed, fGreen, fBlue, 1));
+	}
 	
-	Team GetController(Team _Red, Team _Blue){if(fRed>fBlue){return _Red;}else{return _Blue;}}
+	char* GetController(){if(fRed>fBlue){return "Red";}else{return "Blue";}}
 
 	float fRed, fGreen, fBlue;
 

@@ -19,25 +19,7 @@ public:
 	virtual bool Execute(Agent *_Agent)
 	{
 		float dist2 = 0;
-		if(_Agent->Attack)
-		{
-			Agent *TargetEnemy = nullptr;
-			for ( auto EnemyCurrent : _Agent->Enemies)
-			{
-				TargetEnemy = EnemyCurrent;
-				float Len = 0, tLen;
-
-				tLen = glm::length(_Agent->GetPos()) - glm::length(EnemyCurrent->GetPos());
-				if(tLen < 0){tLen *= -1;}
-				if(tLen > Len){Len = tLen;TargetEnemy = EnemyCurrent;}
-			}
-			if(TargetEnemy != nullptr)
-				dist2 = glm::distance2(_Agent->GetPos(), TargetEnemy->GetPos());
-		}
-		else
-		{
-			dist2 = glm::distance2(_Agent->GetPos(), _Agent->GetTarget());
-		}
+		dist2 = glm::distance2(_Agent->GetPos(), _Agent->GetTarget());
 
 		if (dist2 < Range2)
 			return true;
@@ -56,24 +38,9 @@ public:
 		glm::vec3 Target(0);
 
 		Target.xz = glm::circularRand(Radius);
-		if(_Agent->Attack)
-		{
-			Agent *TargetEnemy = nullptr;
-			for ( auto EnemyCurrent : _Agent->Enemies)
-			{
-				float Len = 0, tLen;
+		Agent *TargetEnemy = nullptr;
 
-				tLen = glm::length(_Agent->GetPos()) - glm::length(EnemyCurrent->GetPos());
-				if(tLen < 0){tLen *= -1;}
-				if(tLen > Len){Len = tLen;TargetEnemy = EnemyCurrent;}
-			}
-			if(TargetEnemy != nullptr)
-				TargetEnemy->SetPos(Target);
-		}
-		else
-		{
-			_Agent->SetTarget(Target);
-		}
+			TargetEnemy->SetPos(Target);
 		return true;
 	}
 	float Radius;
@@ -86,64 +53,67 @@ public:
 
 	virtual bool  Execute(Agent *_Agent)
 	{
-		glm::vec3 Pos;
+		glm::vec3 Pos = _Agent->GetPos();
+
+		Flag *TargetFlag = nullptr;
+		for (auto Flag : _Agent->Flags)
+		{
+			float Len = 0, tLen;
+			tLen = glm::length(Pos) - glm::length(Flag->GetPos());
+			if(tLen < 0){tLen *= -1;}
+			if(tLen > Len){Len = tLen;TargetFlag = Flag;}
+		}
+		if(TargetFlag != nullptr)
+		{
+			_Agent->SetTarget(TargetFlag->Position);
+		}
+	return true;
+	}	
+		float Speed;
+};
+class AttackTarget : public Behaviour
+{
+public:
+	AttackTarget(float _Speed) : Speed(_Speed){}
+	virtual ~AttackTarget(){}
+
+	virtual bool  Execute(Agent *_Agent)
+	{
+		for (auto Flag : _Agent->Flags)
+		{ 
+			int check =0;
+			if(Flag->GetController() != _Agent->MyTeam)
+			{
+				check ++;
+			}
+			if(check >1)
+			{
+				return false;
+			}
+		}
 		
-		_Agent->Move(1.0);
-		if(_Agent->Path.size() > 0)
-		{
-			
-			if(glm::length(_Agent->GetPos()) - glm::length(_Agent->Path[0]->Position)<1.0f)
+			glm::vec3 Pos;
+			Agent *TargetEnemy = nullptr;
+			Pos = _Agent->GetPos();
+			for ( auto EnemyCurrent : _Agent->Enemies)
 			{
-				_Agent->Path.erase(_Agent->Path.begin());
-			}
-		}
-		else//																			no path
-		{
-			if(_Agent->Attack)
-			{
-				//_Agent->SetTarget(_Agent->Move(1.0f));
-			
-				Agent *TargetEnemy = nullptr;
-				Pos = _Agent->GetPos();
-				for ( auto EnemyCurrent : _Agent->Enemies)
-				{
-					float Len = 0, tLen;
+				float Len = 0, tLen;
 
-					tLen = glm::length(Pos) - glm::length(EnemyCurrent->GetPos());
-					if(tLen < 0)
-					{
-						tLen *= -1;
-					}
-					if(tLen > Len)
-					{
-						Len = tLen;
-						TargetEnemy = EnemyCurrent;
-					}
+				tLen = glm::length(Pos) - glm::length(EnemyCurrent->GetPos());
+				if(tLen < 0)
+				{
+					tLen *= -1;
 				}
-					if(TargetEnemy != nullptr)
-					{
-						_Agent->SetTarget(TargetEnemy->GetPos());
-					}
+				if(tLen > Len)
+				{
+					Len = tLen;
+					TargetEnemy = EnemyCurrent;
+				}
 			}
-			else//																			not attack
+			if(TargetEnemy != nullptr)
 			{
-				Flag *TargetFlag = nullptr;
-				for (auto Flag : _Agent->Flags)
-				{
-					float Len = 0, tLen;
-
-					tLen = glm::length(Pos) - glm::length(Flag->GetPos());
-					if(tLen < 0){tLen *= -1;}
-					if(tLen > Len){Len = tLen;TargetFlag = Flag;}
-				}
-				if(TargetFlag != nullptr)
-				{
-					_Agent->SetTarget(TargetFlag->Position);
-				}
-			
+				_Agent->SetTarget(TargetEnemy->GetPos());
 			}
-			//_Agent->PathFind(_Agent->GetTarget());
-		}
 	return true;
 	}	
 		float Speed;
@@ -209,25 +179,37 @@ public:
 		bRedUp = new Button(glm::vec2(100, 25), glm::vec2(50));
 		bRedDown = new Button(glm::vec2(100 ,100), glm::vec2(50));
 
-		Behaviour* Seek = new SeekTarget(10);
+		Behaviour* Defend = new SeekTarget(10);
+		Behaviour* Attack = new AttackTarget(10);
 		Behaviour* Rand = new RandomiseTarget(10);
 		Behaviour* Within = new WithinRange(0.5f);
+
+		//																			A selector will select one (OR)
+		//																			A sequence will go in sequence (AND)
 
 		//																			IF	not within range	THEN	seek	ELSE	randomise target
 		//																			IF	not attack			THEN	Above
 
-		Sequence* Seq = new Sequence();
-		Seq->addchild(Within);
-		Seq->addchild(Rand);
+		//																			If team has control seek go into attack mode otherwise seek out a flag and gain control
 
-		Selector* Root = new Selector();
-		Root->addchild(Seq);
-		Root->addchild(Seek);
+
+		Sequence* Kill = new Sequence();//AND																			if you are within range rand
+		Kill->addchild(Within);
+		Kill->addchild(Rand);
+
+		Sequence* CanAttack = new Sequence();//AND																			if you dont have control defend
+		CanAttack->addchild(Attack);
+		CanAttack->addchild(Kill);
+
+
+		Selector* Root = new Selector();//OR																			defend if you cant attack
+		Root->addchild(CanAttack);
+		Root->addchild(Defend);
 
 		Agenda = Root;
 
-		RedSize = 3;
-		BlueSize = 3;
+		RedSize = 1;
+		BlueSize = 0;
 
 
 
@@ -246,37 +228,34 @@ public:
 
 		for (int i=0;i<RedSize;++i)
 		{
-			Red->AddMember(m_Graph);
+			Red->AddMember(m_Graph, "Red");
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(20.0f);
 			Red->Members[i]->SetPos(NewPos);
-			//std::cout<<i<<" | "<<"PosX       "<<Red->Members[i]->Position.x	<<"     PosZ       "<<Red->Members[i]->Position.z<<'\n';
-			//std::cout<<i<<" | "<<"PosX new   "<<NewPos.x						<<"     PosZ new   "<<NewPos.z<<'\n';
 
 		}
 		for (int i=0;i<BlueSize;++i)
 		{
-			Blue->AddMember(m_Graph);
+			Blue->AddMember(m_Graph, "Blue");
+
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(20.0f);
-			Blue->Members[i]->Position = NewPos;
-			//Blue->Members[i]->SetTarget(Flags[0]->GetPos());
+			Blue->Members[i]->AgentPosition = NewPos;
 
 
 
 		}
 		for(int i=0;i<RedSize;++i)
 		{
-			//Red->Members[i]->SetTarget(Flags[0]->GetPos());
 			Red->Members[i]->CalcEnemy(Blue->Members);
 			Red->Members[i]->SetBehaviour(Agenda);
-			Red->Members[i]->SetPos(Red->Members[i]->GiveScore(m_Graph, Red->Members[i]->Position)->Position);
+			Red->Members[i]->SetPos(Red->Members[i]->GiveScore(m_Graph, Red->Members[i]->AgentPosition)->Position);
 		}
 		for (int i=0;i<BlueSize;++i)
 		{
 			Blue->Members[i]->SetBehaviour(Agenda);
 			Blue->Members[i]->CalcEnemy(Red->Members);
-			Blue->Members[i]->SetPos(Blue->Members[i]->GiveScore(m_Graph, Blue->Members[i]->Position)->Position);
+			Blue->Members[i]->SetPos(Blue->Members[i]->GiveScore(m_Graph, Blue->Members[i]->AgentPosition)->Position);
 
 		}
 
@@ -319,11 +298,11 @@ void NavMesh::onUpdate(float a_deltaTime)
 
 		bBlueUp->Update();
 		if (bBlueUp->IsActivated()){
-			Blue->AddMember(m_Graph);
+			Blue->AddMember(m_Graph, "Blue");
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(10.0f);
 			Blue->Members.back()->SetPos(NewPos);
-			Blue->Members.back()->SetPos(Blue->Members.back()->GiveScore(m_Graph, Blue->Members.back()->Position)->Position);
+			Blue->Members.back()->SetPos(Blue->Members.back()->GiveScore(m_Graph, Blue->Members.back()->AgentPosition)->Position);
 
 			Blue->Members.back()->SetTarget(Flags.back()->GetPos());
 			Blue->Members.back()->SetBehaviour(Agenda);
@@ -338,11 +317,11 @@ void NavMesh::onUpdate(float a_deltaTime)
 		}
 		bRedUp->Update();
 		if (bRedUp->IsActivated()){
-			Red->AddMember(m_Graph);
+			Red->AddMember(m_Graph, "Red");
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(10.0f);
 			Red->Members.back()->SetPos(NewPos);
-			Red->Members.back()->SetPos(Red->Members.back()->GiveScore(m_Graph, Red->Members.back()->Position)->Position);
+			Red->Members.back()->SetPos(Red->Members.back()->GiveScore(m_Graph, Red->Members.back()->AgentPosition)->Position);
 
 			Red->Members.back()->SetTarget(Flags[0]->GetPos());
 			Red->Members.back()->SetBehaviour(Agenda);
@@ -360,68 +339,18 @@ void NavMesh::onUpdate(float a_deltaTime)
 		{
 			Red->Members[i]->CalcEnemy(Blue->Members);
 			Red->Members[i]->Flags = Flags;
-			Red->Members[i]->update(a_deltaTime);
-			Red->Members[i]->SetBehaviour(Agenda);
-
-			if(Red->Members[i]->Position.x < -	20)	{Red->Members[i]->Position.x=-	20;}
-			if(Red->Members[i]->Position.x >	20)	{Red->Members[i]->Position.x=	20;}
-			if(Red->Members[i]->Position.y < -	20)	{Red->Members[i]->Position.y=-	20;}
-			if(Red->Members[i]->Position.y >	20)	{Red->Members[i]->Position.y=	20;}
-
-			Gizmos::addAABBFilled(Red->Members[i]->GetPos(), glm::vec3(0.5f), glm::vec4(1, 0, 0, 1));
-
-			if(Red->Members[i]->Path.size() > 2)
-			{
-				glm::vec3 Pos1 = Red->Members[i]->Position, Pos2 = Red->Members[i]->Path[i]->Position;
-				Gizmos::addLine(Pos1, Pos2, glm::vec4(1, 0, 0, 1));
-				Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), glm::vec4(1, 0.2, 0.2, 1));
-
-				for(int a=0;a>Red->Members[i]->Path.size()-1;a++)
-				{
-					Pos1 = Red->Members[i]->Path[a]->Position;
-					Pos1 = Red->Members[i]->Path[a+1]->Position;
-					Gizmos::addLine(Pos1, Pos2, glm::vec4(1, 0, 0, 1));
-					Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), glm::vec4(1, 0.2, 0.2, 1));
-
-				}
-			}
-
+			Red->Members[i]->update(a_deltaTime, glm::vec4(1, 0, 0, 1));
 		}
 		for (int i=0;i<Blue->Members.size();++i)
 		{
 			Blue->Members[i]->CalcEnemy(Red->Members);
 			Blue->Members[i]->Flags = Flags;
-			Blue->Members[i]->update(a_deltaTime);
-			Blue->Members[i]->SetBehaviour(Agenda);
-
-			if(Blue->Members[i]->Position.x < -	20)	{Blue->Members[i]->Position.x=-	20;}
-			if(Blue->Members[i]->Position.x >	20)	{Blue->Members[i]->Position.x=	20;}
-			if(Blue->Members[i]->Position.y < -	20)	{Blue->Members[i]->Position.y=-	20;}
-			if(Blue->Members[i]->Position.y >	20)	{Blue->Members[i]->Position.y=	20;}
-
-
-			Gizmos::addAABBFilled(Blue->Members[i]->GetPos(), glm::vec3(0.5f), glm::vec4(0, 0, 1, 1));
-
-			if(Blue->Members[i]->Path.size() > 2)
-			{
-				glm::vec3 Pos1 = Blue->Members[i]->Position, Pos2 = Blue->Members[i]->Path[i]->Position;
-				Gizmos::addLine(Pos1, Pos2, glm::vec4(0, 0, 1, 1));
-				Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), glm::vec4(0.2, 0.2, 1, 1));
-
-				for(int a=0;a>Blue->Members[i]->Path.size()-1;a++)
-				{
-					Pos1 = Blue->Members[i]->Path[a]->Position;
-					Pos1 = Blue->Members[i]->Path[a+1]->Position;
-					Gizmos::addLine(Pos1, Pos2, glm::vec4(0, 0, 1, 1));
-					Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), glm::vec4(0.2, 0.2, 1, 1));
-
-				}
-			}
+			Blue->Members[i]->update(a_deltaTime, glm::vec4(0, 0, 1, 1));
 		}
 
 		for (auto i : Flags)
 		{
-			i->Update();
+			i->Update(Red, Blue);
 		}
 	}
 	void NavMesh::onDraw() 

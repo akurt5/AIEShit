@@ -63,8 +63,7 @@ public:
 			return _NodeB;
 	}
 
-	FBXFile*	m_sponza;
-	FBXFile*	m_navMesh;
+	FBXFile *m_sponza, *m_navMesh;
 
 	unsigned int	m_shader;
 
