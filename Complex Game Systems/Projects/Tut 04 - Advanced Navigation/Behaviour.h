@@ -23,7 +23,10 @@ public:
 	Composite(){}
 	virtual ~Composite(){}
 
-	void addchild(Behaviour* _Behaviour) {Children.push_back(_Behaviour);}
+	void addchild(Behaviour* _Behaviour) 
+	{
+		Children.push_back(_Behaviour);
+	}
 
 protected:
 	std::vector <Behaviour*> Children;

@@ -19,7 +19,7 @@ public:
 	virtual bool Execute(Agent *_Agent)
 	{
 		float dist2 = 0;
-		dist2 = glm::distance2(_Agent->GetPos(), _Agent->GetTarget());
+		dist2 = glm::distance2(_Agent->GetPos(), _Agent->GetTarget()->GetPos());
 
 		if (dist2 < Range2)
 			return true;
@@ -38,7 +38,7 @@ public:
 		glm::vec3 Target(0);
 
 		Target.xz = glm::circularRand(Radius);
-		Agent *TargetEnemy = nullptr;
+		Agent *TargetEnemy = _Agent->GetTarget();
 
 			TargetEnemy->SetPos(Target);
 		return true;
@@ -112,7 +112,7 @@ public:
 			}
 			if(TargetEnemy != nullptr)
 			{
-				_Agent->SetTarget(TargetEnemy->GetPos());
+				_Agent->SetTarget(TargetEnemy);
 			}
 	return true;
 	}	
@@ -123,16 +123,17 @@ public:
 #define DEFAULT_SCREENWIDTH 1280
 #define DEFAULT_SCREENHEIGHT 720
 
-	NavMesh::NavMesh()
+	Scene::Scene()
 	{
 
 	}
-	NavMesh::~NavMesh()
+	Scene::~Scene()
 	{
 
 	}
-	bool NavMesh::onCreate(int a_argc, char* a_argv[]) 
+	bool Scene::onCreate(int a_argc, char* a_argv[]) 
 	{
+		srand(time(NULL));
 		// initialise the Gizmos helper class
 		Gizmos::create();
 
@@ -208,8 +209,8 @@ public:
 
 		Agenda = Root;
 
-		RedSize = 1;
-		BlueSize = 0;
+		RedSize = 3;
+		BlueSize = 3;
 
 
 
@@ -262,7 +263,7 @@ public:
 
 		return true;
 	}
-void NavMesh::onUpdate(float a_deltaTime) 
+void Scene::onUpdate(float a_deltaTime) 
 	{
 		// update our camera matrix using the keyboard/mouse
 		Utility::freeMovement( m_cameraMatrix, a_deltaTime, 10 );
@@ -353,7 +354,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 			i->Update(Red, Blue);
 		}
 	}
-	void NavMesh::onDraw() 
+	void Scene::onDraw() 
 	{
 		// clear the backbuffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -421,7 +422,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 		// draw the gizmos from this frame
 		Gizmos::draw(viewMatrix, m_projectionMatrix);
 	}
-	void NavMesh::onDestroy()
+	void Scene::onDestroy()
 	{
 		cleanupOpenGLBuffers(m_sponza);
 		//cleanupOpenGLBuffers(m_navMesh);
@@ -438,7 +439,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 	int main(int argc, char* argv[])
 	{
 		// explicitly control the creation of our application
-		Application* app = new NavMesh();
+		Application* app = new Scene();
 
 		if (app->create("AIE - NavMesh",DEFAULT_SCREENWIDTH,DEFAULT_SCREENHEIGHT,argc,argv) == true)
 			app->run();
@@ -448,7 +449,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 
 		return 0;
 	}
-	void NavMesh::createOpenGLBuffers(FBXFile* a_fbx)
+	void Scene::createOpenGLBuffers(FBXFile* a_fbx)
 	{
 		// create the GL VAO/VBO/IBO data for meshes
 		for ( unsigned int i = 0 ; i < a_fbx->getMeshCount() ; ++i )
@@ -482,7 +483,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 			mesh->m_userData = glData;
 		}
 	}
-	void NavMesh::cleanupOpenGLBuffers(FBXFile* a_fbx)
+	void Scene::cleanupOpenGLBuffers(FBXFile* a_fbx)
 	{
 		// bind our vertex array object and draw the mesh
 		for ( unsigned int i = 0 ; i < a_fbx->getMeshCount() ; ++i )
@@ -500,7 +501,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 
 
 	}
-	void NavMesh::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
+	void Scene::BuildNavMesh(FBXMeshNode *a_Mesh, std::vector<NavNode*> &a_Graph)
 	{
 
 		unsigned int tricount = a_Mesh->m_indices.size() / 3;
@@ -592,7 +593,7 @@ void NavMesh::onUpdate(float a_deltaTime)
 	}
 
 	
-	void NavMesh::Pathtest(int _counter)
+	void Scene::Pathtest(int _counter)
 	{
 		static bool Press = false;
 

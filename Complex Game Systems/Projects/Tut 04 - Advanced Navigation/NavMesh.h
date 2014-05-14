@@ -17,12 +17,12 @@ class Behaviour;
 class Flag;
 
 // Derived application class that wraps up all globals neatly
-class NavMesh : public Application
+class Scene : public Application
 {
 public:
 
-	NavMesh();
-	virtual ~NavMesh();
+	Scene();
+	virtual ~Scene();
 
 
 
@@ -78,7 +78,7 @@ public:
 
 	NavNode *TestNode;
 
-	Behaviour *Agenda, *Agenda2;
+	Behaviour *Agenda;
 	Team *Red, *Blue;
 	glm::mat4	m_screenProjectionMatrix;
 	unsigned int uiRedUp, uiRedDown, uiBlueUp, uiBlueDown;
