@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game Physics Application", "Game Physics Application\Game Physics Application.vcxproj", "{9F10FB84-BFA8-4687-A6BA-5470E1AEE088}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Introduction", "Game Physics Application\Game Physics Application.vcxproj", "{9F10FB84-BFA8-4687-A6BA-5470E1AEE088}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Physics API", "Physics API\Physics API.vcxproj", "{6A5E752D-7817-444E-B163-B84F8F377C99}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Force and Momentum", "Force and Momentum\Force and Momentum.vcxproj", "{59AF1C0C-F18A-47DC-B3B6-AB295F892804}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,14 @@ Global
 		{9F10FB84-BFA8-4687-A6BA-5470E1AEE088}.Debug|Win32.Build.0 = Debug|Win32
 		{9F10FB84-BFA8-4687-A6BA-5470E1AEE088}.Release|Win32.ActiveCfg = Release|Win32
 		{9F10FB84-BFA8-4687-A6BA-5470E1AEE088}.Release|Win32.Build.0 = Release|Win32
+		{6A5E752D-7817-444E-B163-B84F8F377C99}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6A5E752D-7817-444E-B163-B84F8F377C99}.Debug|Win32.Build.0 = Debug|Win32
+		{6A5E752D-7817-444E-B163-B84F8F377C99}.Release|Win32.ActiveCfg = Release|Win32
+		{6A5E752D-7817-444E-B163-B84F8F377C99}.Release|Win32.Build.0 = Release|Win32
+		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Debug|Win32.ActiveCfg = Debug|Win32
+		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Debug|Win32.Build.0 = Debug|Win32
+		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Release|Win32.ActiveCfg = Release|Win32
+		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

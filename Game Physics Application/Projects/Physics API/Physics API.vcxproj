@@ -11,9 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9f10fb84-bfa8-4687-a6ba-5470e1aee088}</ProjectGuid>
-    <RootNamespace>Game_Physics_Application</RootNamespace>
-    <ProjectName>Introduction</ProjectName>
+    <ProjectGuid>{6A5E752D-7817-444E-B163-B84F8F377C99}</ProjectGuid>
+    <RootNamespace>Physics_API</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,13 +39,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)../PhysX-3.2.4_PC_SDK_CORE/Include;$(SolutionDir)../Include;$(SolutionDir)../3rdParty/soil/src;$(SolutionDir)../3rdParty/glfw/include;$(SolutionDir)../3rdParty/glew/include;$(SolutionDir)../3rdParty/glm;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\anton.kurtz\Desktop\Game Physics Application\PhysX-3.2.4_PC_SDK_Core\Lib\win32;$(SolutionDir)../Lib/vs2012;$(SolutionDir)../3rdParty/soil/lib/vs2012;$(SolutionDir)../3rdParty/glew/lib/Release/Win32;$(SolutionDir)../3rdParty/glfw/lib-msvc110;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <IncludePath>$(SolutionDir)../PhysX-3.2.4_PC_SDK_Core/Include;$(SolutionDir)../Include;$(SolutionDir)../3rdParty/soil/src;$(SolutionDir)../3rdParty/glfw/include;$(SolutionDir)../3rdParty/glew/include;$(SolutionDir)../3rdParty/glm;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)../PhysX-3.2.4_PC_SDK_Core/Lib/win32;$(SolutionDir)../Lib/vs2012;$(SolutionDir)../3rdParty/soil/lib/vs2012;$(SolutionDir)../3rdParty/glew/lib/Release/Win32;$(SolutionDir)../3rdParty/glfw/lib-msvc110;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86)</LibraryPath>
     <OutDir>$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)../Include;$(SolutionDir)../3rdParty/soil/src;$(SolutionDir)../3rdParty/glfw/include;$(SolutionDir)../3rdParty/glew/include;$(SolutionDir)../3rdParty/glm;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)../Lib/vs2012;$(SolutionDir)../3rdParty/soil/lib/vs2012;$(SolutionDir)../3rdParty/glew/lib/Release/Win32;$(SolutionDir)../3rdParty/glfw/lib-msvc110;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <IncludePath>$(SolutionDir)../PhysX-3.2.4_PC_SDK_Core/Include;$(SolutionDir)../Include;$(SolutionDir)../3rdParty/soil/src;$(SolutionDir)../3rdParty/glfw/include;$(SolutionDir)../3rdParty/glew/include;$(SolutionDir)../3rdParty/glm;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)../PhysX-3.2.4_PC_SDK_Core/Lib/win32;$(SolutionDir)../Lib/vs2012;$(SolutionDir)../3rdParty/soil/lib/vs2012;$(SolutionDir)../3rdParty/glew/lib/Release/Win32;$(SolutionDir)../3rdParty/glfw/lib-msvc110;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86)</LibraryPath>
     <OutDir>$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -57,7 +56,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>PhysXVisualDebuggerSDKDEBUG.lib;FBXLoader_d.lib;PhysX3DEBUG_x86.lib;PhysX3CommonDEBUG_x86.lib;PhysX3CookingDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;AIEFramework_d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FBXLoader_d.lib;AIEFramework_d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;PhysX3DEBUG_x86.lib;PhysX3CommonDEBUG_x86.lib;PhysX3CookingDEBUG_x86.lib;PhysX3ExtensionsDEBUG.lib;PhysXVisualDebuggerSDKDEBUG.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,14 +71,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>FBXLoader.lib;AIEFramework.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FBXLoader.lib;AIEFramework.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;PhysX3_x86.lib;PhysX3Common_x86.lib;PhysX3Cooking_x86.lib;PhysX3Extensions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game_Physics_Application.cpp" />
+    <ClCompile Include="Physics_API.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game_Physics_Application.h" />
+    <ClInclude Include="Physics_API.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

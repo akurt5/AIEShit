@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Game_Physics_Application.cpp">
+    <ClCompile Include="Force_and_Momentum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game_Physics_Application.h">
+    <ClInclude Include="Force_and_Momentum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
