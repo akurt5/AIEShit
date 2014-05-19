@@ -241,7 +241,7 @@ public:
 
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(20.0f);
-			Blue->Members[i]->AgentPosition = NewPos;
+			Blue->Members[i]->Position = NewPos;
 
 
 
@@ -250,13 +250,13 @@ public:
 		{
 			Red->Members[i]->CalcEnemy(Blue->Members);
 			Red->Members[i]->SetBehaviour(Agenda);
-			Red->Members[i]->SetPos(Red->Members[i]->GiveScore(m_Graph, Red->Members[i]->AgentPosition)->Position);
+			Red->Members[i]->SetPos(Red->Members[i]->GiveScore(m_Graph, Red->Members[i]->Position)->Position);
 		}
 		for (int i=0;i<BlueSize;++i)
 		{
 			Blue->Members[i]->SetBehaviour(Agenda);
 			Blue->Members[i]->CalcEnemy(Red->Members);
-			Blue->Members[i]->SetPos(Blue->Members[i]->GiveScore(m_Graph, Blue->Members[i]->AgentPosition)->Position);
+			Blue->Members[i]->SetPos(Blue->Members[i]->GiveScore(m_Graph, Blue->Members[i]->Position)->Position);
 
 		}
 
@@ -303,7 +303,7 @@ void Scene::onUpdate(float a_deltaTime)
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(10.0f);
 			Blue->Members.back()->SetPos(NewPos);
-			Blue->Members.back()->SetPos(Blue->Members.back()->GiveScore(m_Graph, Blue->Members.back()->AgentPosition)->Position);
+			Blue->Members.back()->SetPos(Blue->Members.back()->GiveScore(m_Graph, Blue->Members.back()->Position)->Position);
 
 			Blue->Members.back()->SetTarget(Flags.back()->GetPos());
 			Blue->Members.back()->SetBehaviour(Agenda);
@@ -322,7 +322,7 @@ void Scene::onUpdate(float a_deltaTime)
 			glm::vec3 NewPos;
 			NewPos.xz = glm::circularRand(10.0f);
 			Red->Members.back()->SetPos(NewPos);
-			Red->Members.back()->SetPos(Red->Members.back()->GiveScore(m_Graph, Red->Members.back()->AgentPosition)->Position);
+			Red->Members.back()->SetPos(Red->Members.back()->GiveScore(m_Graph, Red->Members.back()->Position)->Position);
 
 			Red->Members.back()->SetTarget(Flags[0]->GetPos());
 			Red->Members.back()->SetBehaviour(Agenda);

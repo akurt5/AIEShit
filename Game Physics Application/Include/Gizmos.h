@@ -7,6 +7,8 @@ class Gizmos
 {
 public:
 
+	void addGrid(const glm::vec3& a_center, const glm:: mat4* a_transform,int increments,float size);
+
 	static void		create(unsigned int a_maxLines = 16384, unsigned int a_maxTris = 16384);
 	static void		destroy();
 

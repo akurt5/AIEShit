@@ -17,6 +17,7 @@ public:
 	Agent(std::vector <NavNode*> _Nodes)
 	{
 		Timer = 0;
+		PathTimer = 0;
 		Nodes = _Nodes;
 		RandColour.x = (rand()%100);
 		RandColour.x /=100;
@@ -28,33 +29,30 @@ public:
 	}
 	virtual ~Agent (){}
 
-	const glm::vec3& GetPos () const {return AgentPosition;}
+	const glm::vec3& GetPos () const {return Position;}
 
 	Agent* GetTarget () const{return Target;}
 	void CalcEnemy(std::vector <Agent*> _Team){Enemies = _Team;}
-	void SetPos (const glm::vec3& _Pos) { AgentPosition = _Pos;}
+	void SetPos (const glm::vec3& _Pos) { Position = _Pos;}
 	void SetTarget (Agent *_Target) { Target = _Target;}
 	void SetTarget (glm::vec3 _Target) { v3Target = _Target;}
 	void SetTeam (char *_NewTeam){MyTeam = _NewTeam;}
 	void FollowPath(float _DeltaTime)
 	{
 		glm::vec3 Dest = Path[0]->Position;
-		glm::vec3 Pos = AgentPosition;
-		if(glm::distance(Path[0]->Position, AgentPosition )< 0.01f)
+		glm::vec3 Pos = Position;
+		if(glm::distance(Path[0]->Position, Position )< 0.01f)
 		{
-			AgentPosition = Dest;
+			Position = Dest;
 			std::cout<<"Erased \n";
 			Path.erase(Path.begin());
 		}
 		
 			//																			for now i will just normalise there
 			//																			Interpolate linearly to find the third vector // use a number greater than 1 as time // then spline
-		if(Dest.x != NULL)
-		{
-			glm::normalize(Dest);
+		glm::normalize(Dest);
 		
-			AgentPosition += Dest * _DeltaTime;
-		}
+		Position = Dest * _DeltaTime;
 	}
 	void PathFind(glm::vec3 _EndPos)
 	{
@@ -120,6 +118,7 @@ public:
 
 			}	
 		}
+		//																			Path.erase(Path.begin());
 	}
 	NavNode* GiveScore(std::vector<NavNode*> a_Graph, glm::vec3 _Target)
 	{
@@ -156,26 +155,35 @@ public:
 		}
 		else
 		{
-			PathFind(GetTarget()->AgentPosition);
+			PathFind(GetTarget()->Position);
 		}
 		
-		if(AgentPosition.x < -		20)	{Velocity.x	+=	0.3;}
-		if(AgentPosition.x >		20)	{Velocity.x	-=	0.3;}
-		if(AgentPosition.y < -		20)	{Velocity.y	+=	0.3;}
-		if(AgentPosition.y >		20)	{Velocity.y	-=	0.3;}
+		if(Position.x < -		20)	{Velocity.x	+=	0.3;}
+		if(Position.x >		20)	{Velocity.x	-=	0.3;}
+		if(Position.y < -		20)	{Velocity.y	+=	0.3;}
+		if(Position.y >		20)	{Velocity.y	-=	0.3;}
 
 		if(Path.size() > 2)
 			{			
-				glm::vec3 Pos1 = AgentPosition, Pos2 = Path[0]->Position;
+				glm::vec3 Pos1 = Position, Pos2 = Path[0]->Position;
 				Gizmos::addLine(Pos1, Pos2, RandColour * _TeamColour);
 				Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), RandColour * _TeamColour);
-
 				for(int a=0;a<Path.size()-1;a++)
 				{
 					Pos1 = Path[a]->Position;
 					Pos2 = Path[a+1]->Position;
 					Gizmos::addLine(Pos1, Pos2, RandColour * _TeamColour);
 					Gizmos::addAABBFilled(Pos2, glm::vec3(0.1), RandColour * _TeamColour);
+					PathTimer ++;
+					if(Path.size()>0)
+					{
+						if(PathTimer>=Path.size() * 1000)
+						{
+							PathTimer = 0;
+						}
+					}
+					glm::vec3 Pos3 = Path[(int)PathTimer / 1000]->Position;
+					Gizmos::addAABBFilled(Pos3, glm::vec3(0.2), RandColour * _TeamColour);
 
 				}
 				Gizmos::addTri(Path.front()->Vertices[0],Path.front()->Vertices[1], Path.front()->Vertices[2], RandColour * RandColour * _TeamColour);
@@ -184,10 +192,10 @@ public:
 		
 		
 
-		//AgentPosition += (Velocity * _DeltaTime);
+		//Position += (Velocity * _DeltaTime);
 		Velocity = glm::vec3(0);
 		
-		Gizmos::addAABBFilled(AgentPosition, glm::vec3(0.5f), RandColour * _TeamColour);
+		Gizmos::addAABBFilled(Position, glm::vec3(0.5f), RandColour * _TeamColour);
 	}
 
 	Behaviour* Behave;
@@ -199,9 +207,10 @@ public:
 	std::vector <Flag*> Flags;
 	Agent *Target;
 	int Timer;
-	glm::vec3 AgentPosition, Velocity, v3Target;
+	glm::vec3 Position, Velocity, v3Target;
 	glm::vec4 RandColour;
 	char *MyTeam;
+	float PathTimer;
 };
 
 class Team
