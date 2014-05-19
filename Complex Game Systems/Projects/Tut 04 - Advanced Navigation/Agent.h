@@ -51,7 +51,7 @@ public:
 			//																			Interpolate linearly to find the third vector // use a number greater than 1 as time // then spline
 		if(Dest.x != NULL)
 		{
-			glm::normalize(Dest);
+			glm::normalize(Dest.xz);
 		
 			AgentPosition += Dest * _DeltaTime;
 		}
