@@ -18,11 +18,19 @@ public:
 	virtual ~WithinRange(){}
 	virtual bool Execute(Agent *_Agent)
 	{
-		float dist2 = 0;
-		dist2 = glm::distance2(_Agent->GetPos(), _Agent->GetTarget()->GetPos());
+		_Agent->MyCurrentBehaviour = "Ranging to my target";
+		float dist2 = 1000;
+		if(_Agent->GetTarget() != nullptr)
+		{
+			dist2 = glm::distance2(_Agent->GetPos(), _Agent->GetTarget()->GetPos());
+		}
 
 		if (dist2 < Range2)
+		{
+				std::cout<<_Agent<<"  Range true   "<<_Agent->MyTeam<<"\n";
+
 			return true;
+		}
 		return false;
 	}
 
@@ -31,54 +39,56 @@ public:
 class RandomiseTarget : public Behaviour
 {
 public:
-	RandomiseTarget(float _Radius) : Radius(_Radius){}
+	RandomiseTarget(){}
 	virtual ~RandomiseTarget(){}
 	virtual bool Execute(Agent *_Agent)
 	{
-		glm::vec3 Target(0);
+		_Agent->MyCurrentBehaviour = "Randomising my target";
 
-		Target.xz = glm::circularRand(Radius);
+
 		Agent *TargetEnemy = _Agent->GetTarget();
-
-			TargetEnemy->SetPos(Target);
+		glm::vec3 nodepos = _Agent->Nodes[rand()%(_Agent->Nodes.size()-1)]->Position;
+		TargetEnemy->SetPos(nodepos);
+		std::cout<<_Agent<<"  Rand True   "<<_Agent->MyTeam<<" "<<nodepos.x<<" "<<nodepos.y<<" "<<nodepos.z<<"\n";
+		//																			 killed sum1
 		return true;
 	}
-	float Radius;
 };
 class SeekTarget : public Behaviour
 {
 public:
-	SeekTarget(float _Speed) : Speed(_Speed){}
+	SeekTarget(){}
 	virtual ~SeekTarget(){}
 
 	virtual bool  Execute(Agent *_Agent)
 	{
+		_Agent->MyCurrentBehaviour = "moving to a flag";
+
 		glm::vec3 Pos = _Agent->GetPos();
 
 		Flag *TargetFlag = nullptr;
-		for (auto Flag : _Agent->Flags)
-		{
-			float Len = 0, tLen;
-			tLen = glm::length(Pos) - glm::length(Flag->GetPos());
-			if(tLen < 0){tLen *= -1;}
-			if(tLen > Len){Len = tLen;TargetFlag = Flag;}
-		}
+		TargetFlag = _Agent->Flags[0];
+
 		if(TargetFlag != nullptr)
 		{
 			_Agent->SetTarget(TargetFlag->Position);
+			_Agent->SetTarget(nullptr);
+			//																			std::cout<<_Agent<<"  Likes Flags and is gay          "<<_Agent->MyTeam<<"\n";
 		}
+
 	return true;
 	}	
-		float Speed;
 };
 class AttackTarget : public Behaviour
 {
 public:
-	AttackTarget(float _Speed) : Speed(_Speed){}
+	AttackTarget(){}
 	virtual ~AttackTarget(){}
 
 	virtual bool  Execute(Agent *_Agent)
 	{
+		_Agent->MyCurrentBehaviour = "Chasing down an enemy";
+
 		for (auto Flag : _Agent->Flags)
 		{ 
 			int check =0;
@@ -86,37 +96,29 @@ public:
 			{
 				check ++;
 			}
-			if(check >1)
+			if(check > 1)
 			{
 				return false;
-			}
-		}
+
+			}//																			if your team owns no flags go get em
+		}//																			else kill enemies
 		
 			glm::vec3 Pos;
 			Agent *TargetEnemy = nullptr;
 			Pos = _Agent->GetPos();
-			for ( auto EnemyCurrent : _Agent->Enemies)
-			{
-				float Len = 0, tLen;
-
-				tLen = glm::length(Pos) - glm::length(EnemyCurrent->GetPos());
-				if(tLen < 0)
-				{
-					tLen *= -1;
-				}
-				if(tLen > Len)
-				{
-					Len = tLen;
-					TargetEnemy = EnemyCurrent;
-				}
-			}
+			TargetEnemy = _Agent->Enemies[rand()%(_Agent->Enemies.size()-1)];
 			if(TargetEnemy != nullptr)
 			{
+				_Agent->SetTarget(V3NULL);
 				_Agent->SetTarget(TargetEnemy);
+				_Agent->MoveVal = 50;
+
+				//																			std::cout<<_Agent<<"  Likes Men and is gay          "<<_Agent->MyTeam<<"\n";
 			}
+				//																			std::cout<<_Agent<<"  Attack True   "<<_Agent->MyTeam<<"\n";
+
 	return true;
 	}	
-		float Speed;
 };
 
 
@@ -180,10 +182,10 @@ public:
 		bRedUp = new Button(glm::vec2(100, 25), glm::vec2(50));
 		bRedDown = new Button(glm::vec2(100 ,100), glm::vec2(50));
 
-		Behaviour* Defend = new SeekTarget(10);
-		Behaviour* Attack = new AttackTarget(10);
-		Behaviour* Rand = new RandomiseTarget(10);
-		Behaviour* Within = new WithinRange(0.5f);
+		Behaviour* Defend = new SeekTarget();
+		Behaviour* Attack = new AttackTarget();
+		Behaviour* Rand = new RandomiseTarget();
+		Behaviour* Within = new WithinRange(0.01f);
 
 		//																			A selector will select one (OR)
 		//																			A sequence will go in sequence (AND)
@@ -209,8 +211,8 @@ public:
 
 		Agenda = Root;
 
-		RedSize = 3;
-		BlueSize = 3;
+		RedSize = 2;
+		BlueSize = 2;
 
 
 
@@ -223,15 +225,15 @@ public:
 			Flags.emplace_back(new Flag());
 
 		}
-		Flags[0]->Position = glm::vec3(15, 0, 7);
-		Flags[1]->Position = glm::vec3(0, 0, 0);
-		Flags[2]->Position = glm::vec3(-15, 0, -7);
+		//Flags[0]->Position = glm::vec3(15, 0, 7);
+		Flags[0]->Position = glm::vec3(0, 0, 0);
+		//Flags[2]->Position = glm::vec3(-15, 0, -7);
 
 		for (int i=0;i<RedSize;++i)
 		{
 			Red->AddMember(m_Graph, "Red");
 			glm::vec3 NewPos;
-			NewPos.xz = glm::circularRand(20.0f);
+			NewPos = Red->Members[i]->Nodes[rand()%(Red->Members[i]->Nodes.size()-1)]->Position;
 			Red->Members[i]->SetPos(NewPos);
 
 		}
@@ -240,7 +242,7 @@ public:
 			Blue->AddMember(m_Graph, "Blue");
 
 			glm::vec3 NewPos;
-			NewPos.xz = glm::circularRand(20.0f);
+			NewPos = Blue->Members[i]->Nodes[rand()%(Blue->Members[i]->Nodes.size()-1)]->Position;
 			Blue->Members[i]->Position = NewPos;
 
 
@@ -250,14 +252,11 @@ public:
 		{
 			Red->Members[i]->CalcEnemy(Blue->Members);
 			Red->Members[i]->SetBehaviour(Agenda);
-			Red->Members[i]->SetPos(Red->Members[i]->GiveScore(m_Graph, Red->Members[i]->Position)->Position);
 		}
 		for (int i=0;i<BlueSize;++i)
 		{
 			Blue->Members[i]->SetBehaviour(Agenda);
 			Blue->Members[i]->CalcEnemy(Red->Members);
-			Blue->Members[i]->SetPos(Blue->Members[i]->GiveScore(m_Graph, Blue->Members[i]->Position)->Position);
-
 		}
 
 
@@ -301,9 +300,8 @@ void Scene::onUpdate(float a_deltaTime)
 		if (bBlueUp->IsActivated()){
 			Blue->AddMember(m_Graph, "Blue");
 			glm::vec3 NewPos;
-			NewPos.xz = glm::circularRand(10.0f);
-			Blue->Members.back()->SetPos(NewPos);
-			Blue->Members.back()->SetPos(Blue->Members.back()->GiveScore(m_Graph, Blue->Members.back()->Position)->Position);
+			NewPos = Blue->Members.back()->Nodes[rand()%(Blue->Members.back()->Nodes.size()-1)]->Position;
+			Blue->Members.back()->Position = NewPos;
 
 			Blue->Members.back()->SetTarget(Flags.back()->GetPos());
 			Blue->Members.back()->SetBehaviour(Agenda);
@@ -320,9 +318,8 @@ void Scene::onUpdate(float a_deltaTime)
 		if (bRedUp->IsActivated()){
 			Red->AddMember(m_Graph, "Red");
 			glm::vec3 NewPos;
-			NewPos.xz = glm::circularRand(10.0f);
-			Red->Members.back()->SetPos(NewPos);
-			Red->Members.back()->SetPos(Red->Members.back()->GiveScore(m_Graph, Red->Members.back()->Position)->Position);
+			NewPos = Red->Members.back()->Nodes[rand()%(Red->Members.back()->Nodes.size()-1)]->Position;
+			Red->Members.back()->Position = NewPos;
 
 			Red->Members.back()->SetTarget(Flags[0]->GetPos());
 			Red->Members.back()->SetBehaviour(Agenda);
@@ -333,6 +330,20 @@ void Scene::onUpdate(float a_deltaTime)
 			if(Red->Members.size() <= 1)
 			{
 				Red->DelMember();
+			}
+		}
+
+		for (auto red : Red->Members)
+		{
+			for (auto blue : Blue->Members)
+			{
+				if(blue->Position == red->Position)
+				{
+					glm::vec3 nodepos = red->Nodes[rand()%(red->Nodes.size()-1)]->Position;
+					red->SetPos(nodepos);
+					nodepos = blue->Nodes[rand()%(blue->Nodes.size()-1)]->Position;
+					blue->SetPos(nodepos);
+				}
 			}
 		}
 
@@ -358,6 +369,22 @@ void Scene::onUpdate(float a_deltaTime)
 	{
 		// clear the backbuffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		if(!glfwGetKey(m_window, GLFW_KEY_B))
+		{
+			for (int i=0;i<Red->Members.size();++i)
+			{
+				Red->Members[i]->Draw(glm::vec4(1, 0, 0, 1));
+			}
+		}
+		if(!glfwGetKey(m_window, GLFW_KEY_R))
+		{
+			for (int i=0;i<Blue->Members.size();++i)
+			{
+				Blue->Members[i]->Draw(glm::vec4(0, 0, 1, 1));
+			}
+		}
+
 
 		// get the view matrix from the world-space camera matrix
 		glm::mat4 viewMatrix = glm::inverse( m_cameraMatrix );
