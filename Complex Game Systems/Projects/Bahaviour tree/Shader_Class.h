@@ -6,8 +6,8 @@
 #include <glm/glm.hpp>
 #include "Gizmos.h"
 #include "Utilities.h"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <glew.h>
+#include <glfw3.h>
 #include <glm/ext.hpp>
 #include <string>
 #include <sstream>

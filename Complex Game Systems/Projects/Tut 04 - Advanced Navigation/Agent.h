@@ -3,6 +3,7 @@
 #include "Behaviour.h"
 #include "Utilities.h"
 #include <glm\glm.hpp>
+#include <glm\ext.hpp>
 #include <vector>
 #include <algorithm>
 #include "NavNode.h"
