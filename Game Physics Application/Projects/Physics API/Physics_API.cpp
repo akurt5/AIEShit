@@ -55,6 +55,17 @@ void AddBox(const glm::vec3& v3_Transform, const glm::vec3& v3_Dimensions,float 
 	g_PhysXActors.push_back(dynamicActor);
 }
 
+void AddBall(const glm::vec3& v3_Transform, const float _Dimensions,float f_density) {
+	//add a ball
+	physx::PxSphereGeometry ball(_Dimensions);
+	physx::PxTransform transform(physx::PxVec3(v3_Transform.x,v3_Transform.y,v3_Transform.z));
+	physx::PxRigidDynamic* dynamicActor = PxCreateDynamic(*g_Physics, transform, ball,*g_PhysicsMaterial, f_density); 
+	//add it to the physX scene
+	g_PhysicsScene->addActor(*dynamicActor);
+	//add it to our copy of the scene
+	g_PhysXActors.push_back(dynamicActor);
+}
+
 void setUpVisualDebugger() {
 	// check if PvdConnection manager is available on this platform
 	if (NULL == g_Physics->getPvdConnectionManager())
@@ -193,9 +204,21 @@ bool Physics_API::onCreate(int a_argc, char* a_argv[]) {
 	setUpPhysXTutorial();
 	setUpVisualDebugger();
 	AddPlane(glm::vec3(0,1,0));
-	AddBox(glm::vec3(0,0,0),glm::vec3(1),100);
 	//!- TUTORIAL
+	for ( int x = -5; x < 5; x++)
+	{
+		for ( int y = 1; y < 10; y++)
+		{
+			for ( int z = -5; z < 5; z++)
+			{
+				AddBox(glm::vec3(x,y-0.499,z),glm::vec3(0.5),100);
+			}
 
+		}
+	}
+	
+	
+	timer = 0;
 	return true;
 }
 
@@ -208,10 +231,52 @@ void Physics_API::onUpdate(float a_deltaTime) {
 		Gizmos::addLine( glm::vec3(10, 0, -10 + i), glm::vec3(-10, 0, -10 + i),  i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
 	}
 	
+	
+	if(timer <= 0.0f)
+	{
+		timer = 1/20.0f;
+		float power = 100;
+
+		if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_5))
+		{
+			//add a box
+			physx::PxSphereGeometry bullet(1);
+			physx::PxTransform transform(physx::PxVec3(m_cameraMatrix[3].x, m_cameraMatrix[3].y, m_cameraMatrix[3].z));
+			physx::PxRigidDynamic* Projectile = PxCreateDynamic(*g_Physics, transform, bullet,*g_PhysicsMaterial, 100); 
+			//																			add force
+			glm::vec3 Force(m_cameraMatrix[2] * -power);
+			Projectile->setLinearVelocity(physx::PxVec3(Force.x, Force.y, Force.z));//								, physx::PxForceMode::eVELOCITY_CHANGE);
+			//add it to the physX scene
+			g_PhysicsScene->addActor(*Projectile);
+			//add it to our copy of the scene
+			g_PhysXActors.push_back(Projectile);
+			
+		}
+		if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_4))
+		{
+			//add a box
+			physx::PxBoxGeometry bullet(1, 1, 1);
+			physx::PxTransform transform(physx::PxVec3(m_cameraMatrix[3].x, m_cameraMatrix[3].y, m_cameraMatrix[3].z));
+			physx::PxRigidDynamic* Projectile = PxCreateDynamic(*g_Physics, transform, bullet,*g_PhysicsMaterial, 100); 
+			//																			add force
+			glm::vec3 Force(m_cameraMatrix[2] * -power);
+			Projectile->setLinearVelocity(physx::PxVec3(Force.x, Force.y, Force.z));//								, physx::PxForceMode::eVELOCITY_CHANGE);
+			//add it to the physX scene
+			g_PhysicsScene->addActor(*Projectile);
+			//add it to our copy of the scene
+			g_PhysXActors.push_back(Projectile);
+		}
+			
+	}
+	else if (timer >0)
+	{
+		timer -= a_deltaTime;
+	}
+
 	//!- TUTORIAL
 	upDatePhysx();
 	//!- TUTORIAL
-	
+
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		quit();
 	}

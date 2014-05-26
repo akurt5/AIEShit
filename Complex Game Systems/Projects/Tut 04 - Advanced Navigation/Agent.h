@@ -268,29 +268,33 @@ public:
 				Bdist = Bdisttemp;
 			}
 		}
-			if((Rdist > Bdist)&&(Bdist < 30))
+			if((Rdist > Bdist)&&(Bdist < 3))
 			{
-				if(fBlue <1 && fBlue >=0)
+				if(fBlue < 1.00000f)
 				{
-					fBlue += 0.000001;
+					fBlue += 0.01;
+					std::cout<<fBlue<<"    +Blue\n";
 					//																			printf("blue team \n");
 				}
-				if(fRed <1 && fRed >=0)
+				if(fRed > 0.00000f)
 				{
-					fRed -= 0.000001;
+					fRed -= 0.01;
+					std::cout<<fRed<<"    -Red\n";
 				}
 			}
-			else if((Bdist > Rdist)&&(Rdist < 30))
+			else if((Bdist > Rdist)&&(Rdist < 3))
 			{
-				if(fBlue <1 && fBlue >=0)
+				if(fBlue > 0.00000f)
 				{
-					fBlue -= 0.000001;
+					fBlue -= 0.01;
+					std::cout<<fBlue<<"    -Blue\n";
 					//																			printf("red team \n");
 
 				}
-				if(fRed <1 && fRed >=0)
+				if(fRed < 1.00000f)
 				{
-					fRed += 0.000001;
+					fRed += 0.01;
+					std::cout<<fRed<<"   +Red\n";
 				}
 			}
 			char* tempController = GetController();

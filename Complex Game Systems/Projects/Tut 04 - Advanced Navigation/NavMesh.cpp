@@ -91,12 +91,7 @@ public:
 
 		for (auto Flag : _Agent->Flags)
 		{ 
-			int check =0;
 			if(Flag->GetController() != _Agent->MyTeam)
-			{
-				check ++;
-			}
-			if(check > 1)
 			{
 				return false;
 
@@ -332,17 +327,36 @@ void Scene::onUpdate(float a_deltaTime)
 				Red->DelMember();
 			}
 		}
-
-		for (auto red : Red->Members)
+		for (auto red1 : Red->Members)
 		{
-			for (auto blue : Blue->Members)
+			for (auto red2 : Red->Members)
 			{
-				if(blue->Position == red->Position)
+				if(red1->Position == red2->Position && red1 != red2)
 				{
-					glm::vec3 nodepos = red->Nodes[rand()%(red->Nodes.size()-1)]->Position;
-					red->SetPos(nodepos);
-					nodepos = blue->Nodes[rand()%(blue->Nodes.size()-1)]->Position;
-					blue->SetPos(nodepos);
+					glm::vec3 nodepos = red1->Nodes[rand()%(red1->Nodes.size()-1)]->Position;
+					red1->SetPos(nodepos);
+					nodepos = red2->Nodes[rand()%(red2->Nodes.size()-1)]->Position;
+					red2->SetPos(nodepos);
+				}
+				for (auto blue1 : Blue->Members)
+				{
+					for (auto blue2 : Blue->Members)
+					{
+						if(blue1->Position == blue2->Position && blue1 != blue2)
+						{
+							glm::vec3 nodepos = blue1->Nodes[rand()%(blue1->Nodes.size()-1)]->Position;
+							blue1->SetPos(nodepos);
+							nodepos = blue2->Nodes[rand()%(blue2->Nodes.size()-1)]->Position;
+							blue2->SetPos(nodepos);
+						}
+						if(blue1->Position == red1->Position)
+						{
+							glm::vec3 nodepos = red1->Nodes[rand()%(red1->Nodes.size()-1)]->Position;
+							red1->SetPos(nodepos);
+							nodepos = blue1->Nodes[rand()%(blue1->Nodes.size()-1)]->Position;
+							blue1->SetPos(nodepos);
+						}
+					}
 				}
 			}
 		}

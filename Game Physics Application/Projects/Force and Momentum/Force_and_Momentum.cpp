@@ -23,7 +23,14 @@ std::vector<physx::PxRigidDynamic*> g_PhysXActors;
 
 Force_and_Momentum::Force_and_Momentum(){}
 Force_and_Momentum::~Force_and_Momentum(){}
+class BallClass
+{
+public:
+	BallClass(){}
+	~BallClass(){}
 
+
+};
 class myAllocator: public physx::PxAllocatorCallback{
 public:
 	virtual ~myAllocator() {}
@@ -35,7 +42,6 @@ public:
 		_aligned_free(ptr);
 	}
 };
-
 void setUpPhysXTutorial(){
 	physx::PxAllocatorCallback *myCallback = new myAllocator();
 	g_PhysicsFoundation = PxCreateFoundation(PX_PHYSICS_VERSION,*myCallback, gDefaultErrorCallback);
@@ -54,21 +60,18 @@ void setUpPhysXTutorial(){
 		printf("start physx scene2\n");
 	}
 }
-
 void cleanUpPhsyx() {
 	g_PhysicsCooker->release();
 	g_PhysicsScene->release();
 	g_Physics->release();
 	g_PhysicsFoundation->release();
 }
-
 void upDatePhysx(){
 	g_PhysicsScene->simulate( 1/120.f );
 	while (g_PhysicsScene->fetchResults() == false) {
 	// don’t need to do anything here yet but we still need to do the fetch
 	}
 }
-
 void AddPlane(glm::vec3 v3_Facing){
 	//add a plane
 	physx::PxTransform pose = physx::PxTransform( physx::PxVec3(0,0,0),physx::PxQuat(physx::PxHalfPi * 0.95f, physx::PxVec3(0.0f, 0.0f, 1.0f)));
@@ -76,7 +79,6 @@ void AddPlane(glm::vec3 v3_Facing){
 	//add it to the physX scene
 	g_PhysicsScene->addActor(*plane);
 }
-
 void AddBox(const glm::vec3& v3_Transform, const glm::vec3& v3_Dimentions,float f_density) {
 	//add a box
 	physx::PxBoxGeometry box(v3_Dimentions.x,v3_Dimentions.y,v3_Dimentions.z);
@@ -87,7 +89,6 @@ void AddBox(const glm::vec3& v3_Transform, const glm::vec3& v3_Dimentions,float 
 	//add it to our copy of the scene
 	g_PhysXActors.push_back(dynamicActor);
 }
-
 void setUpVisualDebugger() {
 	// check if PvdConnection manager is available on this platform
 	if (NULL == g_Physics->getPvdConnectionManager())
@@ -102,7 +103,6 @@ void setUpVisualDebugger() {
 	physx::PxVisualDebuggerExt::createConnection(g_Physics->getPvdConnectionManager(),pvd_host_ip, port, timeout, connectionFlags);
 	// pvd_host_ip, port, timeout, connectionFlags));
 }
-
 bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	Gizmos::create();
 	m_cameraMatrix = glm::inverse( glm::lookAt(glm::vec3(10,10,10),glm::vec3(0,0,0), glm::vec3(0,1,0)) );
@@ -118,6 +118,20 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	AddBox(glm::vec3(0,0,0),glm::vec3(1),100);
 	//!- TUTORIAL
 
+
+	BallClass *newBall;
+	physicsScene = new DIYPhysicScene();
+	physicsScene->gravity = glm::vec3(0,-10,0);
+	physicsScene->timeStep = .1f;
+	//add four balls to our simulation
+	newBall = new BallClass(glm::vec3(-40,0,0),PI/4.0f,30.0f,0,3.0f,1,glm::vec4(1,0,0,1)); 
+	physicsScene->addActor(newBall);
+	newBall = new BallClass(glm::vec3(-40,0,0),PI/3.0f,30.0f,0,3.0f,1,glm::vec4(0,1,0,1)); 
+	physicsScene->addActor(newBall);
+	newBall = new BallClass(glm::vec3(-40,0,0),PI/2.0f,30.0f,0,3.0f,1,glm::vec4(0,0,1,1));  
+	physicsScene->addActor(newBall);
+	newBall = new BallClass(glm::vec3(-40,0,0),0,30.0f,0,3.0f,1,glm::vec4(1,1,0,1));  
+	physicsScene->addActor(newBall);
 	return true;
 }
 
