@@ -49,7 +49,7 @@ public:
 		Agent *TargetEnemy = _Agent->GetTarget();
 		glm::vec3 nodepos = _Agent->Nodes[rand()%(_Agent->Nodes.size()-1)]->Position;
 		TargetEnemy->SetPos(nodepos);
-		std::cout<<_Agent<<"  Rand True   "<<_Agent->MyTeam<<" "<<nodepos.x<<" "<<nodepos.y<<" "<<nodepos.z<<"\n";
+		std::cout<<_Agent<<"  Rand True   "<<_Agent->MyTeam<<" team got a kill!   "<<nodepos.x<<" "<<nodepos.y<<" "<<nodepos.z<<"\n";
 		//																			 killed sum1
 		return true;
 	}
@@ -214,14 +214,18 @@ public:
 		Red = new Team();
 		Blue = new Team();
 
-		int FlagCount = 3;
+		int FlagCount = 1;
 		for (int i=0;i<FlagCount;i++)
 		{
 			Flags.emplace_back(new Flag());
+			
+			glm::vec3 NewPos;
+			NewPos = m_Graph[rand()%(m_Graph.size()-1)]->Position;
+			Flags[i]->Position = NewPos;
 
 		}
 		//Flags[0]->Position = glm::vec3(15, 0, 7);
-		Flags[0]->Position = glm::vec3(0, 0, 0);
+			
 		//Flags[2]->Position = glm::vec3(-15, 0, -7);
 
 		for (int i=0;i<RedSize;++i)

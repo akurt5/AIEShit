@@ -18,9 +18,15 @@
     <ClCompile Include="Force_and_Momentum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DIYPhysicsEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Force_and_Momentum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DIYPhysicsEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

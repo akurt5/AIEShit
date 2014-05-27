@@ -75,9 +75,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DIYPhysicsEngine.cpp" />
     <ClCompile Include="Force_and_Momentum.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DIYPhysicsEngine.h" />
     <ClInclude Include="Force_and_Momentum.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

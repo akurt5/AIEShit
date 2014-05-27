@@ -23,14 +23,6 @@ std::vector<physx::PxRigidDynamic*> g_PhysXActors;
 
 Force_and_Momentum::Force_and_Momentum(){}
 Force_and_Momentum::~Force_and_Momentum(){}
-class BallClass
-{
-public:
-	BallClass(){}
-	~BallClass(){}
-
-
-};
 class myAllocator: public physx::PxAllocatorCallback{
 public:
 	virtual ~myAllocator() {}
@@ -118,20 +110,6 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	AddBox(glm::vec3(0,0,0),glm::vec3(1),100);
 	//!- TUTORIAL
 
-
-	BallClass *newBall;
-	physicsScene = new DIYPhysicScene();
-	physicsScene->gravity = glm::vec3(0,-10,0);
-	physicsScene->timeStep = .1f;
-	//add four balls to our simulation
-	newBall = new BallClass(glm::vec3(-40,0,0),PI/4.0f,30.0f,0,3.0f,1,glm::vec4(1,0,0,1)); 
-	physicsScene->addActor(newBall);
-	newBall = new BallClass(glm::vec3(-40,0,0),PI/3.0f,30.0f,0,3.0f,1,glm::vec4(0,1,0,1)); 
-	physicsScene->addActor(newBall);
-	newBall = new BallClass(glm::vec3(-40,0,0),PI/2.0f,30.0f,0,3.0f,1,glm::vec4(0,0,1,1));  
-	physicsScene->addActor(newBall);
-	newBall = new BallClass(glm::vec3(-40,0,0),0,30.0f,0,3.0f,1,glm::vec4(1,1,0,1));  
-	physicsScene->addActor(newBall);
 	return true;
 }
 

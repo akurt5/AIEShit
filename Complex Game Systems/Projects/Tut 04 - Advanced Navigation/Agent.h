@@ -120,19 +120,14 @@ public:
 
 		}while((CurrentNode->Position.x != EndNode->Position.x)&&(CurrentNode->Position.z != EndNode->Position.z));
 
-		Path.emplace(Path.begin(), CurrentNode);
 
-		while((CurrentNode->Parent != nullptr))
-		{
+		Path.emplace_back(CurrentNode);
+
+		while((CurrentNode->Parent != nullptr)/*&&(CurrentNode != nullptr)*/){
 
 			Path.emplace(Path.begin(), CurrentNode->Parent);
 			CurrentNode = CurrentNode->Parent;
-			if(Path.size()>200)
-			{
-				Path.clear();
-				return;
-			}
-			Path.emplace(Path.begin(), CurrentNode);
+
 		}
 	}
 	NavNode* GiveScore(std::vector<NavNode*> a_Graph, glm::vec3 _Target)
@@ -167,7 +162,7 @@ public:
 			Behave->Execute(this);
 		}
 		glm::vec3 TargetPos = (GetTarget() != nullptr)?GetTarget()->Position:v3Target;
-		if(Path.size() > 0)//																			&&(Last == TargetPos))
+		if(Path.size() > 1)//																			&&(Last == TargetPos))
 		{
 			FollowPath(_DeltaTime);
 		}
@@ -250,12 +245,12 @@ public:
 	glm::vec3 GetPos(){return Position;}
 	void Update(Team *_Red, Team *_Blue)
 	{
-		float Rdist = 0, Rdisttemp = 0, Bdist = 0, Bdisttemp = 0;
+		float Rdist = 40, Rdisttemp = 0, Bdist = 40, Bdisttemp = 0;
 		for(auto Guy : _Red->Members)
 		{
 			Rdisttemp = glm::distance(Guy->GetPos(), Position);
 
-			if(Rdist < Rdisttemp)
+			if(Rdist > Rdisttemp)
 			{
 				Rdist = Rdisttemp;
 			}
@@ -263,38 +258,35 @@ public:
 		for(auto Dude : _Blue->Members)
 		{
 			Bdisttemp = glm::distance(Dude->GetPos(), Position);
-			if(Bdist < Bdisttemp)
+
+			if(Bdist > Bdisttemp)
 			{
 				Bdist = Bdisttemp;
 			}
 		}
-			if((Rdist > Bdist)&&(Bdist < 3))
+			if((Rdist > Bdist)&&(Bdist < 1))
 			{
 				if(fBlue < 1.00000f)
 				{
 					fBlue += 0.01;
-					std::cout<<fBlue<<"    +Blue\n";
 					//																			printf("blue team \n");
 				}
 				if(fRed > 0.00000f)
 				{
 					fRed -= 0.01;
-					std::cout<<fRed<<"    -Red\n";
 				}
 			}
-			else if((Bdist > Rdist)&&(Rdist < 3))
+			else if((Bdist > Rdist)&&(Rdist < 1))
 			{
 				if(fBlue > 0.00000f)
 				{
 					fBlue -= 0.01;
-					std::cout<<fBlue<<"    -Blue\n";
 					//																			printf("red team \n");
 
 				}
 				if(fRed < 1.00000f)
 				{
 					fRed += 0.01;
-					std::cout<<fRed<<"   +Red\n";
 				}
 			}
 			char* tempController = GetController();

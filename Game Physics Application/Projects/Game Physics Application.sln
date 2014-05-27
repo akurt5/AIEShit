@@ -7,6 +7,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Physics API", "Physics API\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Force and Momentum", "Force and Momentum\Force and Momentum.vcxproj", "{59AF1C0C-F18A-47DC-B3B6-AB295F892804}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Projectile Motion", "Projectile Motion\Projectile Motion.vcxproj", "{5AA77479-D261-4489-8709-CF3711903D5A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Collision Imposters", "Collision Imposters\Collision Imposters.vcxproj", "{E8166B9C-6612-4571-B5DD-5D2E6EF39DDC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Assignment Game Physics Application", "Assignment Game Physics Application\Assignment Game Physics Application.vcxproj", "{E2DCA7F5-2748-426B-8FE9-49CA40AC4F9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -25,6 +31,18 @@ Global
 		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Debug|Win32.Build.0 = Debug|Win32
 		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Release|Win32.ActiveCfg = Release|Win32
 		{59AF1C0C-F18A-47DC-B3B6-AB295F892804}.Release|Win32.Build.0 = Release|Win32
+		{5AA77479-D261-4489-8709-CF3711903D5A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5AA77479-D261-4489-8709-CF3711903D5A}.Debug|Win32.Build.0 = Debug|Win32
+		{5AA77479-D261-4489-8709-CF3711903D5A}.Release|Win32.ActiveCfg = Release|Win32
+		{5AA77479-D261-4489-8709-CF3711903D5A}.Release|Win32.Build.0 = Release|Win32
+		{E8166B9C-6612-4571-B5DD-5D2E6EF39DDC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E8166B9C-6612-4571-B5DD-5D2E6EF39DDC}.Debug|Win32.Build.0 = Debug|Win32
+		{E8166B9C-6612-4571-B5DD-5D2E6EF39DDC}.Release|Win32.ActiveCfg = Release|Win32
+		{E8166B9C-6612-4571-B5DD-5D2E6EF39DDC}.Release|Win32.Build.0 = Release|Win32
+		{E2DCA7F5-2748-426B-8FE9-49CA40AC4F9F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E2DCA7F5-2748-426B-8FE9-49CA40AC4F9F}.Debug|Win32.Build.0 = Debug|Win32
+		{E2DCA7F5-2748-426B-8FE9-49CA40AC4F9F}.Release|Win32.ActiveCfg = Release|Win32
+		{E2DCA7F5-2748-426B-8FE9-49CA40AC4F9F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
