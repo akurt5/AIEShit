@@ -10,4 +10,3 @@ del "*.sdf"
 attrib -h "*.suo"
 del "*.suo"
 echo All done. should be clean for transferal :D
-pause

@@ -207,7 +207,7 @@ public:
 	}
 	void Draw(glm::vec4 _TeamColour)
 	{
-		Gizmos::addAABBFilled(Position, glm::vec3(0.5f), (RandColour + _TeamColour) / 1.75);
+		Gizmos::addAABBFilled(Position, glm::vec3(0.5f), (RandColour + _TeamColour) / 2);
 
 	}
 	Behaviour* Behave;
@@ -294,7 +294,7 @@ public:
 			char* tempController = GetController();
 			if((tempController != nullptr)&&(tempController != Controller))
 			{
-				std::cout<<tempController<<'\n';
+				//std::cout<<tempController<<'\n';
 				Controller = tempController;
 			}
 			//																			draw

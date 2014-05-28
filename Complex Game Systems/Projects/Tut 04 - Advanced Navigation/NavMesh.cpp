@@ -133,12 +133,19 @@ public:
 		srand(time(NULL));
 		// initialise the Gizmos helper class
 		Gizmos::create();
+		
+		//																			load button textures
+		uiBlueUp = SOIL_load_OGL_texture("../../Build/textures/blueup.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+		uiBlueDown = SOIL_load_OGL_texture("../../Build/textures/bluedown.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+		uiRedUp = SOIL_load_OGL_texture("../../Build/textures/redup.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+		uiRedDown = SOIL_load_OGL_texture("../../Build/textures/reddown.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
 
 		// create a world-space matrix for a camera
 		m_cameraMatrix = glm::inverse( glm::lookAt(glm::vec3(20,20,0),glm::vec3(0,0,0), glm::vec3(0,1,0)) );
 
 		// create a perspective projection matrix with a 90 degree field-of-view and widescreen aspect ratio
 		m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, DEFAULT_SCREENWIDTH/(float)DEFAULT_SCREENHEIGHT, 0.1f, 1000.0f);
+		m_screenProjectionMatrix = glm::ortho<float>(0, DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT, 0,0,100);
 
 		// set the clear colour and enable depth testing and backface culling
 		glClearColor(0.25f,0.25f,0.25f,1);
@@ -155,10 +162,7 @@ public:
 
 		BuildNavMesh(m_navMesh->getMeshByIndex(0), m_Graph);	
 
-		uiBlueUp = SOIL_load_OGL_texture("../../Build/textures/blueup.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-		uiBlueDown = SOIL_load_OGL_texture("../../Build/textures/bluedown.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-		uiRedUp = SOIL_load_OGL_texture("../../Build/textures/redup.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
-		uiRedDown = SOIL_load_OGL_texture("../../Build/textures/reddown.png", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, 0);
+		
 
 		unsigned int vs = Utility::loadShader("../../Build/shaders/sponza.vert", GL_VERTEX_SHADER);
 		unsigned int fs = Utility::loadShader("../../Build/shaders/sponza.frag", GL_FRAGMENT_SHADER);
@@ -412,9 +416,39 @@ void Scene::onUpdate(float a_deltaTime)
 		// get the view matrix from the world-space camera matrix
 		glm::mat4 viewMatrix = glm::inverse( m_cameraMatrix );
 
+		
+
+		glUseProgram(m_shader);
+
+
+		int location = glGetUniformLocation(m_shader, "projectionView");
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( m_projectionMatrix * viewMatrix ));
+
+
+
+		if (glfwGetKey(m_window, GLFW_KEY_SPACE))
+		{
+			unsigned int count = m_sponza->getMeshCount();
+			for (unsigned int i = 0 ; i < count ; ++i )
+			{
+				FBXMeshNode* mesh = m_sponza->getMeshByIndex(i);
+
+				GLData* data = (GLData*)mesh->m_userData;
+
+				location = glGetUniformLocation(m_shader, "model");
+				glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( mesh->m_globalTransform ));
+
+				location = glGetUniformLocation(m_shader, "invTransposeModel");
+				glUniformMatrix4fv(location, 1, GL_TRUE, glm::value_ptr( glm::inverse( mesh->m_globalTransform ) ));
+
+				glBindVertexArray(data->vao);
+				glDrawElements(GL_TRIANGLES, mesh->m_indices.size(), GL_UNSIGNED_INT, nullptr);
+			}
+		}
+
 		glUseProgram(Screen->m_shader);
 
-		int location = glGetUniformLocation(Screen->m_shader, "Projection");
+		location = glGetUniformLocation(Screen->m_shader, "Projection");
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( m_screenProjectionMatrix));
 
 		GLint uDiffuseTexture1 = glGetUniformLocation(Screen->m_shader, "Texture");
@@ -441,34 +475,6 @@ void Scene::onUpdate(float a_deltaTime)
 		glUniform1i( uDiffuseTexture4, 0 );
 		bRedDown->Draw();
 
-		glUseProgram(m_shader);
-
-
-		location = glGetUniformLocation(m_shader, "projectionView");
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( m_projectionMatrix * viewMatrix ));
-
-
-
-		if (glfwGetKey(m_window, GLFW_KEY_SPACE))
-		{
-			unsigned int count = m_sponza->getMeshCount();
-			for (unsigned int i = 0 ; i < count ; ++i )
-			{
-				FBXMeshNode* mesh = m_sponza->getMeshByIndex(i);
-
-				GLData* data = (GLData*)mesh->m_userData;
-
-				location = glGetUniformLocation(m_shader, "model");
-				glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr( mesh->m_globalTransform ));
-
-				location = glGetUniformLocation(m_shader, "invTransposeModel");
-				glUniformMatrix4fv(location, 1, GL_TRUE, glm::value_ptr( glm::inverse( mesh->m_globalTransform ) ));
-
-				glBindVertexArray(data->vao);
-				glDrawElements(GL_TRIANGLES, mesh->m_indices.size(), GL_UNSIGNED_INT, nullptr);
-			}
-		}
-
 		// draw the gizmos from this frame
 		Gizmos::draw(viewMatrix, m_projectionMatrix);
 	}
@@ -481,7 +487,7 @@ void Scene::onUpdate(float a_deltaTime)
 		delete m_sponza;
 
 		glDeleteProgram(m_shader);
-
+		glDeleteProgram(Screen->m_shader);
 		// clean up anything we created
 		Gizmos::destroy();
 	}

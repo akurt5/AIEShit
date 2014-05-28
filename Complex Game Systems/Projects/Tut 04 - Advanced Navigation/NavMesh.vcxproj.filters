@@ -26,9 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NavMesh.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Agent.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -36,13 +33,16 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="button.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader_Class.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="NavMesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NavNode.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader_Class.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
