@@ -79,11 +79,11 @@ public:
 
 		Open.emplace_back(CurrentNode);
 		Open.emplace_back(CurrentNode);
-		if((CurrentNode->Position.x != EndNode->Position.x)&&(CurrentNode->Position.z != EndNode->Position.z))
+/*		if((CurrentNode->Position.x != EndNode->Position.x)&&(CurrentNode->Position.z != EndNode->Position.z))
 		{
 			Path.emplace_back(CurrentNode);
 			Path.emplace_back(EndNode);
-		}
+		}*/
 		do{
 			Closed.emplace_back(Open.front());
 			Open.erase(Open.begin());
@@ -118,7 +118,7 @@ public:
 
 			}
 
-		}while((CurrentNode->Position.x != EndNode->Position.x)&&(CurrentNode->Position.z != EndNode->Position.z));
+		}while((CurrentNode->Position.x != EndNode->Position.x)||(CurrentNode->Position.z != EndNode->Position.z));
 
 
 		Path.emplace_back(CurrentNode);
@@ -161,15 +161,16 @@ public:
 		{
 			Behave->Execute(this);
 		}
+		//std::cout<<this<<"   "<<MyTeam<<"   "<<MyCurrentBehaviour<<'\n';
 		glm::vec3 TargetPos = (GetTarget() != nullptr)?GetTarget()->Position:v3Target;
-		if(Path.size() > 1)//																			&&(Last == TargetPos))
+		if((Path.size() > 0)&&(Last == TargetPos))
 		{
 			FollowPath(_DeltaTime);
 		}
 		else
 		{
 				PathFind(TargetPos);
-				//																			Last = TargetPos;
+				Last = TargetPos;
 		}
 		
 		if(Position.x < -	20)	{Velocity.x	+=	0.3;}
@@ -206,7 +207,7 @@ public:
 	}
 	void Draw(glm::vec4 _TeamColour)
 	{
-		Gizmos::addAABBFilled(Position, glm::vec3(0.5f), RandColour * _TeamColour);
+		Gizmos::addAABBFilled(Position, glm::vec3(0.5f), (RandColour + _TeamColour) / 1.75);
 
 	}
 	Behaviour* Behave;
@@ -240,11 +241,12 @@ public:
 class Flag
 {
 public:
-	Flag(){fRed = 0, fBlue = 0; Controller = nullptr;}
+	Flag(){fRed = 0, fBlue = 0; Controller = nullptr;LifeTime = 6000;Age = 0;}
 	virtual ~Flag(){}
 	glm::vec3 GetPos(){return Position;}
-	void Update(Team *_Red, Team *_Blue)
+	bool Update(Team *_Red, Team *_Blue)
 	{
+		
 		float Rdist = 40, Rdisttemp = 0, Bdist = 40, Bdisttemp = 0;
 		for(auto Guy : _Red->Members)
 		{
@@ -295,14 +297,26 @@ public:
 				std::cout<<tempController<<'\n';
 				Controller = tempController;
 			}
-
-		Gizmos::addAABBFilled(Position, glm::vec3(0.1f, 2, 0.1f), glm::vec4(fRed, 0, fBlue, 1));
+			//																			draw
+		Gizmos::addAABBFilled(Position, glm::vec3(0.1f, 2, 0.1f), glm::vec4(fRed, 0, fBlue, 1));	
+		//																			move the flag every so often
+		if(!Age)
+		{
+			Age = LifeTime;
+			return true;
+		}
+		else 
+		{
+			Age--;
+		}
+		return false;
 	}
 	
 	char* GetController(){if(fRed>fBlue){return "Red";}else if(fRed==fBlue){return "Blue";}else{return nullptr;}}
 
 	float fRed, fBlue;
 	char* Controller;
+	int LifeTime, Age;
 
 	glm::vec3 Position;
 };

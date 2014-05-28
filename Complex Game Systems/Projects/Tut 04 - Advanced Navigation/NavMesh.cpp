@@ -87,7 +87,7 @@ public:
 
 	virtual bool  Execute(Agent *_Agent)
 	{
-		_Agent->MyCurrentBehaviour = "Chasing down an enemy";
+		
 
 		for (auto Flag : _Agent->Flags)
 		{ 
@@ -97,7 +97,7 @@ public:
 
 			}//																			if your team owns no flags go get em
 		}//																			else kill enemies
-		
+		_Agent->MyCurrentBehaviour = "Chasing down an enemy";
 			glm::vec3 Pos;
 			Agent *TargetEnemy = nullptr;
 			Pos = _Agent->GetPos();
@@ -200,9 +200,9 @@ public:
 		CanAttack->addchild(Kill);
 
 
-		Selector* Root = new Selector();//OR																			defend if you cant attack
-		Root->addchild(CanAttack);
+		Sequence* Root = new Sequence();//OR																			defend if you cant attack
 		Root->addchild(Defend);
+		Root->addchild(CanAttack);
 
 		Agenda = Root;
 
@@ -380,7 +380,12 @@ void Scene::onUpdate(float a_deltaTime)
 
 		for (auto i : Flags)
 		{
-			i->Update(Red, Blue);
+			if(i->Update(Red, Blue))
+			{
+				glm::vec3 NewPos;
+				NewPos = m_Graph[rand()%(m_Graph.size()-1)]->Position;
+				i->Position = NewPos;
+			}
 		}
 	}
 	void Scene::onDraw() 
