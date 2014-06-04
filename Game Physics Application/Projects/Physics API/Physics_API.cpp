@@ -43,7 +43,16 @@ void AddPlane(glm::vec3 v3_Facing){
 	//add it to the physX scene
 	g_PhysicsScene->addActor(*plane);
 }
-
+void AddCapsule(const glm::vec3& v3_Transform, float _Density) {
+	//																			add a box
+	physx::PxCapsuleGeometry capsule(1, 1);
+	physx::PxTransform transform(physx::PxVec3(v3_Transform.x,v3_Transform.y,v3_Transform.z));
+	physx::PxRigidDynamic* dynamicActor = PxCreateDynamic(*g_Physics, transform, capsule,*g_PhysicsMaterial, _Density);
+	//add it to the physX scene
+	g_PhysicsScene->addActor(*dynamicActor);
+	//add it to our copy of the scene
+	g_PhysXActors.push_back(dynamicActor);
+}
 void AddBox(const glm::vec3& v3_Transform, const glm::vec3& v3_Dimensions,float f_density) {
 	//add a box
 	physx::PxBoxGeometry box(v3_Dimensions.x,v3_Dimensions.y,v3_Dimensions.z);
@@ -80,7 +89,27 @@ void setUpVisualDebugger() {
 	physx::PxVisualDebuggerExt::createConnection(g_Physics->getPvdConnectionManager(),pvd_host_ip, port, timeout, connectionFlags);
 	// pvd_host_ip, port, timeout, connectionFlags));
 }
-
+void addCapsule	(physx::PxShape* shape, physx::PxRigidDynamic* _Actor)
+{
+	//get the geometry for this PhysX collision volume
+	physx::PxBoxGeometry geometry;
+	bool status = shape->getBoxGeometry(geometry);
+	//get the transform for this PhysX collision volume
+	physx::PxMat44 m(physx::PxShapeExt::getGlobalPose(*shape));
+	glm::mat4 M(m.column0.x, m.column0.y, m.column0.z, m.column0.w,
+	m.column1.x, m.column1.y, m.column1.z, m.column1.w,
+	m.column2.x, m.column2.y, m.column2.z, m.column2.w,
+	m.column3.x, m.column3.y, m.column3.z, m.column3.w);
+	glm::vec3 position; 
+	//get the position out of the transform
+	position.x = m.getPosition().x;
+	position.y = m.getPosition().y;
+	position.z = m.getPosition().z;
+	//create our box gizmo
+	Gizmos::addSphere(glm::vec3(position.x, position.y + 1, position.z),5, 5, 1, glm::vec4(1, 0, 0, 1),&M);
+	Gizmos::addCylinderFilled(position, 1, 1, 5, glm::vec4(1, 0, 0, 1));
+	Gizmos::addSphere(glm::vec3(position.x, position.y + 1, position.z),5, 5, 1, glm::vec4(1, 0, 0, 1),&M);
+}
 void addBox(physx::PxShape* pShape,physx::PxRigidDynamic* actor) 
 {
 	//get the geometry for this PhysX collision volume
@@ -109,6 +138,27 @@ void addBox(physx::PxShape* pShape,physx::PxRigidDynamic* actor)
 	//create our box gizmo
 	Gizmos::addAABBFilled(position,extents,colour,&M);
 }
+void addSphere(physx::PxShape* pShape,physx::PxRigidDynamic* actor) 
+{
+	//get the geometry for this PhysX collision volume
+	physx::PxBoxGeometry geometry;
+	float radius = 1;
+	bool status = pShape->getBoxGeometry(geometry);
+	//get the transform for this PhysX collision volume
+	physx::PxMat44 m(physx::PxShapeExt::getGlobalPose(*pShape));
+	glm::mat4 M(m.column0.x, m.column0.y, m.column0.z, m.column0.w,
+	m.column1.x, m.column1.y, m.column1.z, m.column1.w,
+	m.column2.x, m.column2.y, m.column2.z, m.column2.w,
+	m.column3.x, m.column3.y, m.column3.z, m.column3.w);
+	glm::vec3 position; 
+	//get the position out of the transform
+	position.x = m.getPosition().x;
+	position.y = m.getPosition().y;
+	position.z = m.getPosition().z;
+	glm::vec4 colour = glm::vec4(1,0,0,1);
+	//create our box gizmo
+	Gizmos::addSphere(position,5, 5, radius, colour,&M);
+}
 
 void addWidget(physx::PxShape* shape,physx::PxRigidDynamic* actor) 
 { 
@@ -118,9 +168,12 @@ void addWidget(physx::PxShape* shape,physx::PxRigidDynamic* actor)
 		case physx::PxGeometryType::eBOX:
 			addBox(shape,actor);
 		break;
-		//case PxGeometryType::eSPHERE:
-		//	addSphere(shape,actor);
-		//break;
+		case physx::PxGeometryType::eSPHERE:
+			addSphere(shape,actor);
+		break;
+		case physx::PxGeometryType::eCAPSULE:
+			addCapsule(shape,actor);
+		break;
     } 
 }
 void setUpPhysXTutorial(){
@@ -265,6 +318,10 @@ void Physics_API::onUpdate(float a_deltaTime) {
 			g_PhysicsScene->addActor(*Projectile);
 			//add it to our copy of the scene
 			g_PhysXActors.push_back(Projectile);
+		}
+		if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_1))
+		{
+			AddCapsule(glm::vec3(m_cameraMatrix[3].xyz), 100);
 		}
 			
 	}
