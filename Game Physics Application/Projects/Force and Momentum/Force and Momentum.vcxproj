@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{59AF1C0C-F18A-47DC-B3B6-AB295F892804}</ProjectGuid>
     <RootNamespace>Force_and_Momentum</RootNamespace>
+    <ProjectName>Linear Force and Momentum</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -3,6 +3,7 @@
 
 #include "Application.h"
 #include <glm/glm.hpp>
+#include "DIYPhisicsClass.h"
 
 // Derived application class that wraps up all globals neatly
 class Force_and_Momentum : public Application
@@ -22,9 +23,8 @@ protected:
 	glm::mat4	m_cameraMatrix;
 	glm::mat4	m_projectionMatrix;
 	
-	//!- TUTORIAL
 	
-	//!- TUTORIAL
+	DIYPhisicsHandle *DIYPhysicsScene;
 };
 
 #endif // __Force_and_Momentum_H_
