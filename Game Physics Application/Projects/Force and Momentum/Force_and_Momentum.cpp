@@ -29,7 +29,8 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	DIYPhysicsScene->Load();
 	for(int i=0;i<10;i++)
 	{
-		PhysicsObject *Box = new PhysicsObject(100, 100, NULL, VEC3NULL, VEC3NULL, glm::vec3 (1), glm::vec3(Box->Dimensions.x *2*i, Box->Dimensions.y *2*i, Box->Dimensions.z *2*i), glm::vec3(0));
+		//PhysicsObject *Box = new PhysicsObject(PhysicsObject::BOX, 100, 100, NULL, glm::vec3(0 + (i * 2)));
+		PhysicsObject *Box = new PhysicsObject();
 		DIYPhysicsScene->AddBox(Box);
 	}
 	//																			YeahYeah
@@ -68,7 +69,7 @@ void Force_and_Momentum::onDraw() {
 void Force_and_Momentum::onDestroy(){
 
 	//																			YeahYeah
-	DIYPhysicsScene->Draw();
+	DIYPhysicsScene->Unload();
 	//																			YeahYeah
 	Gizmos::destroy();
 }
