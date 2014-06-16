@@ -16,26 +16,26 @@ class PhysicsObject
 public:
 	enum Collider
 	{
-		PLANE,
-		SPHERE,
-		CAPSULE,
-		BOX,
+		ENULL = 0,
+		PLANE = 1,
+		SPHERE = PLANE << 1,
+		CAPSULE = SPHERE << 1,
+		BOX = CAPSULE <<1,
 	};
 
-	PhysicsObject(Collider _Type = BOX, 
-		float _Mass = 100, 
-		float _Density = 100, 
-		glm::vec3 _Position = glm::vec3(0.0f, 2.0f, 0.0f), 
-		glm::vec3 _Force = glm::vec3(0.0f), 
-		glm::vec3 _Velocity = glm::vec3(0.0f), 
-		glm::vec4 _Colour = glm::vec4(1, 0, 0, 1), 
-		bool _Static = false);
-	~PhysicsObject(void);
+	PhysicsObject(bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position, glm::vec3 _Force, glm::vec4 _Colour)
+	{
+	Static		= _Static;
+	Mass		= _Mass;
+	Velocity	= _Velocity;
+	Position	= _Position;
+	Force		= _Force;
+	Colour		= _Colour;
+	}
+	~PhysicsObject(){}
 	
-	void Load		(Collider _Type = BOX, float _Mass = 100, float _Density = 100, float _Radius = NULL, glm::vec3 _Position = glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3 _Dimensions = glm::vec3(1.0f), glm::vec3 _Force = glm::vec3(0.0f), glm::vec3 _Velocity = glm::vec3(0.0f), glm::vec4 _Colour = glm::vec4(1, 0, 0, 1), bool _Static = false);//parameters are generic sizes 
-	void Update		();
-	void Draw		();
-	void Unload		();
+	virtual void Update		();
+	virtual void Draw		() = NULL;
 
 	void AddForce	(glm::vec3 _Force, glm::vec3 _Damping);
 
@@ -47,24 +47,21 @@ public:
 
 
 };
-
-class Plane : public PhysicsObject {
-public:
-	glm::vec3 Forward, Up, Right;
-
-public:
-	Plane(glm::vec3 _Normal, glm::vec3 _Offset, glm::vec4 _Colour) { 
+class Plane : public PhysicsObject
+{
+	Plane(glm::vec3 _Normal, glm::vec3 _Offset) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position, _Force, _Colour)
+	{
 		Position = _Offset;
-		Colour = _Colour;
 		Up = glm::normalize(_Normal); 
 		Right = glm::cross(Up, glm::vec3(0,0,1));
 		Forward = glm::cross(Up, -Right);
 
 		Type = Collider::PLANE; 
 	}
-	virtual ~Plane() { }
-
-	virtual void Draw(glm::vec3 Position) {
+	~Plane(){}
+	void Create();
+	virtual void Draw(glm::vec3 Position) 
+	{
 		glm::vec3 P1	= Position + ( Forward - Right) * 10000.0f;
 		glm::vec3 P2	= Position + ( Forward + Right) * 10000.0f;
 		glm::vec3 P3	= Position + (-Forward - Right) * 10000.0f;
@@ -73,23 +70,43 @@ public:
 		Gizmos::addTri(P1, P2, P3, Colour);
 		Gizmos::addTri(P3, P2, P4, Colour);
 	}
+
+	glm::vec3  Dimensions, Up, Right, Forward;
 };
 class Box : public PhysicsObject
 {
 	Box(){}
 	~Box(){}
+	void Create();
+	void Update(){PhysicsObject::Update();}
+	void Draw(){Gizmos::addAABBFilled(Position, Dimensions, Colour);}
+
 	glm::vec3  Dimensions;
 };
 class Sphere : public PhysicsObject
 {
-	Sphere(){}
+	Sphere(float _Radius,bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position, glm::vec3 _Force, glm::vec4 _Colour) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position, _Force, _Colour)
+	{
+		Radius = _Radius;
+	}
 	~Sphere(){}
+	void Create();
+	void Draw(){Gizmos::addSphere(Position, 5, 5, Radius, Colour);}
+
 	float Radius;
 };
 class Capsule : public PhysicsObject
 {
 	Capsule(){}
 	~Capsule(){}
+	void Create();
+	void Draw()
+	{
+		Gizmos::addSphere(glm::vec3(Position.x, Position.y + Radius, Position.z), 5, 5, Radius, Colour);
+		Gizmos::addLine(glm::vec3(Position.x, Position.y + Radius, Position.z), glm::vec3(Position.x, Position.y - Radius, Position.z), Colour);
+		Gizmos::addSphere(glm::vec3(Position.x, Position.y - Radius, Position.z), 5, 5, Radius, Colour);
+	}
+
 	float Radius, HalfLength;
 };
 
