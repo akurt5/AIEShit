@@ -23,14 +23,23 @@ public:
 		BOX = CAPSULE <<1,
 	};
 
-	PhysicsObject(bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position, glm::vec3 _Force, glm::vec4 _Colour)
+	PhysicsObject(bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position/*, glm::vec3 _Force*/, glm::vec4 _Colour)
 	{
 	Static		= _Static;
 	Mass		= _Mass;
 	Velocity	= _Velocity;
 	Position	= _Position;
-	Force		= _Force;
+	//Force		= _Force;
 	Colour		= _Colour;
+	}
+	PhysicsObject()
+	{
+		Static		= false;
+		Mass		= 100.0f;
+		Velocity	= glm::vec3(0);
+		Position	= glm::vec3(0);
+		//Force		= glm::vec3(0);
+		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
 	}
 	~PhysicsObject(){}
 	
@@ -39,7 +48,7 @@ public:
 
 	void AddForce	(glm::vec3 _Force, glm::vec3 _Damping);
 
-	float Mass, Density;
+	float Mass, Density, CollideRadius;
 	glm::vec3 Velocity, Position, Force;
 	glm::vec4 Colour;
 	Collider Type;
@@ -49,7 +58,8 @@ public:
 };
 class Plane : public PhysicsObject
 {
-	Plane(glm::vec3 _Normal, glm::vec3 _Offset) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position, _Force, _Colour)
+public:
+	Plane(glm::vec3 _Normal, glm::vec3 _Offset, bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position/*, glm::vec3 _Force*/, glm::vec4 _Colour) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position/*, _Force*/, _Colour)
 	{
 		Position = _Offset;
 		Up = glm::normalize(_Normal); 
@@ -57,6 +67,16 @@ class Plane : public PhysicsObject
 		Forward = glm::cross(Up, -Right);
 
 		Type = Collider::PLANE; 
+	}
+	Plane() : PhysicsObject()
+	{
+		Up			= glm::normalize(glm::vec3(0));
+		Static		= false;
+		Mass		= 100.0f;
+		Velocity	= glm::vec3(0);
+		Position	= glm::vec3(0, -1.0f, 0);
+		Force		= glm::vec3(0);
+		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
 	}
 	~Plane(){}
 	void Create();
@@ -75,7 +95,23 @@ class Plane : public PhysicsObject
 };
 class Box : public PhysicsObject
 {
-	Box(){}
+public:
+	Box(glm::vec3 _Dimensions, bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position/*, glm::vec3 _Force*/, glm::vec4 _Colour) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position/*, _Force*/, _Colour)
+	{
+		Dimensions = _Dimensions;
+		CollideRadius = (Dimensions.x > Dimensions.y)? Dimensions.x : (Dimensions.y > Dimensions.z)?Dimensions.y : Dimensions.z;
+	}
+	Box() : PhysicsObject()
+	{
+		CollideRadius = 0.5f;
+		Dimensions	= glm::vec3(0.5f);
+		Static		= false;
+		Mass		= 100.0f;
+		Velocity	= glm::vec3(0);
+		Position	= glm::vec3(0);
+		Force		= glm::vec3(0);
+		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
+	}
 	~Box(){}
 	void Create();
 	void Update(){PhysicsObject::Update();}
@@ -85,9 +121,23 @@ class Box : public PhysicsObject
 };
 class Sphere : public PhysicsObject
 {
-	Sphere(float _Radius,bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position, glm::vec3 _Force, glm::vec4 _Colour) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position, _Force, _Colour)
+public:
+	Sphere(float _Radius, bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position/*, glm::vec3 _Force*/, glm::vec4 _Colour) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position/*, _Force*/, _Colour)
 	{
 		Radius = _Radius;
+		CollideRadius = Radius;
+
+	}
+	Sphere() : PhysicsObject()
+	{
+		Radius		= 1.0f;
+		Static		= false;
+		Mass		= 100.0f;
+		Velocity	= glm::vec3(0);
+		Position	= glm::vec3(0);
+		Force		= glm::vec3(0);
+		CollideRadius = Radius;
+		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
 	}
 	~Sphere(){}
 	void Create();
@@ -97,7 +147,26 @@ class Sphere : public PhysicsObject
 };
 class Capsule : public PhysicsObject
 {
-	Capsule(){}
+public:
+	Capsule(float _Radius, float _HalfLength, bool _Static, float _Density, float _Mass, glm::vec3 _Velocity, glm::vec3 _Position/*, glm::vec3 _Force*/, glm::vec4 _Colour) : PhysicsObject(_Static, _Density, _Mass, _Velocity, _Position/*, _Force*/, _Colour)
+	{
+		Radius = _Radius;
+		HalfLength = _HalfLength;
+		CollideRadius = Radius + HalfLength;
+	}
+	Capsule() : PhysicsObject()
+	{
+		Radius		= 1.0f;
+		HalfLength	= 0.5f;
+		Static		= false;
+		Mass		= 100.0f;
+		Velocity	= glm::vec3(0);
+		Position	= glm::vec3(0);
+		Force		= glm::vec3(0);
+		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
+		CollideRadius = Radius + HalfLength;
+
+	}
 	~Capsule(){}
 	void Create();
 	void Draw()
@@ -129,8 +198,12 @@ public:
 
 	void Shoot	(GLFWwindow *_Window, glm::mat4 _Camera);
 
-	bool IsCollide(PhysicsObject * _ActorA, PhysicsObject * _ActorB);
-	bool CollideScene();
+	//bool IsCollide(Sphere * _ActorA, Sphere * _ActorB);
+	//bool IsCollide(Box * _ActorA, Sphere * _ActorB);
+	//bool IsCollide(Sphere * _ActorA, Box * _ActorB);
+	//bool IsCollide(Box * _ActorA, Box * _ActorB);
+	//																			bool IsCollide(PhysicsObject *_ActorA, PhysicsObject *_ActorB);
+	//																			bool CollideScene();
 
 	int Timer;
 

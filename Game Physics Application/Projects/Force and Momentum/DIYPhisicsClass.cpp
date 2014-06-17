@@ -57,7 +57,7 @@ void DIYPhisicsHandle::Shoot(GLFWwindow *_Window, glm::mat4 _Camera)
 		Timer = 1/20.0f;
 		float power = 100;
 		PhysicsObject *MyProjectile;
-		MyProjectile = new Sphere(1, false, 100, 100, glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec4(1, 0, 0, 1));
+		MyProjectile = new Sphere();
 		if (glfwGetMouseButton(_Window, GLFW_MOUSE_BUTTON_5))
 		{
 			Actors.push_back(MyProjectile);
@@ -69,12 +69,51 @@ void DIYPhisicsHandle::Shoot(GLFWwindow *_Window, glm::mat4 _Camera)
 		}
 	}
 }
-bool DIYPhisicsHandle::IsCollide(PhysicsObject * _ActorA, PhysicsObject * _ActorB)
+//bool DIYPhisicsHandle::IsCollide(Sphere * _ActorA, Sphere * _ActorB)
+//{
+//	float dist = glm::length(_ActorA->Position - _ActorB->Position);
+//	float leng = _ActorA->Radius - _ActorB->Radius;
+//	if(abs(dist) >  leng)
+//	{
+//		printf("colliding      Sphere Sphere       ");
+//		_ActorA->Velocity *= 0.95;
+//		_ActorA->Velocity *= -1; 
+//		_ActorB->Velocity *= 0.95;
+//		_ActorB->Velocity *= -1; 
+//		return true;
+//	}
+//	return false;
+//}
+//bool DIYPhisicsHandle::IsCollide(Box * _ActorA, Sphere * _ActorB)
+//{
+//	float dist = glm::length(_ActorA->Position - _ActorB->Position);
+//	float leng = _ActorA->Radius - _ActorB->Radius;
+//	if(abs(dist) >  leng)
+//	{
+//		printf("colliding      Sphere Sphere       ");
+//		_ActorA->Velocity *= 0.95;
+//		_ActorA->Velocity *= -1; 
+//		_ActorB->Velocity *= 0.95;
+//		_ActorB->Velocity *= -1; 
+//		return true;
+//	}
+//	return false;
+//}
+//bool DIYPhisicsHandle::IsCollide(Sphere * _ActorA, Box * _ActorB)
+//{
+//
+//}
+//bool DIYPhisicsHandle::IsCollide(Box * _ActorA, Box * _ActorB)
+//{
+//
+//}
+/*bool IsCollide(PhysicsObject *_ActorA, PhysicsObject *_ActorB)
 {
 	float dist = glm::length(_ActorA->Position - _ActorB->Position);
-	float leng = _ActorA->Radius - _ActorB->Radius;
+	float leng = _ActorA->CollideRadius - _ActorB->CollideRadius;
 	if(abs(dist) >  leng)
 	{
+		printf("colliding  ");
 		_ActorA->Velocity *= 0.95;
 		_ActorA->Velocity *= -1; 
 		_ActorB->Velocity *= 0.95;
@@ -83,6 +122,7 @@ bool DIYPhisicsHandle::IsCollide(PhysicsObject * _ActorA, PhysicsObject * _Actor
 	}
 	return false;
 }
+
 bool DIYPhisicsHandle::CollideScene()
 {
 	for (auto ActorA : Actors)
@@ -95,5 +135,5 @@ bool DIYPhisicsHandle::CollideScene()
 			}
 		}
 	}
-}
+}*/
 

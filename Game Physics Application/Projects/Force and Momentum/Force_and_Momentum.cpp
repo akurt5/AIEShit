@@ -29,9 +29,8 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	DIYPhysicsScene->Load();
 	for(int i=0;i<10;i++)
 	{
-		//PhysicsObject *Box = new PhysicsObject(PhysicsObject::BOX, 100, 100, NULL, glm::vec3(0 + (i * 2)));
-		PhysicsObject *Box = new PhysicsObject();
-		DIYPhysicsScene->AddBox(Box);
+		Box *Cube = new Box();
+		DIYPhysicsScene->AddBox(Cube);
 	}
 	//																			YeahYeah
 
