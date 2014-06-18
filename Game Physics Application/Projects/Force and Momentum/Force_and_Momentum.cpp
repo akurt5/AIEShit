@@ -27,12 +27,21 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	//																			YeahYeah
 	DIYPhysicsScene = new DIYPhisicsHandle();
 	DIYPhysicsScene->Load();
-	for(int i=0;i<10;i++)
+	for(int i=0;i<4;i++)
 	{
-		Box *Cube = new Box();
-		DIYPhysicsScene->AddBox(Cube);
+		for(int a=0;a<1;a++)
+		{
+			for(int b=0;b<4;b++)
+			{
+				Sphere *ball = new Sphere(glm::vec3 (i*2, a +5, b*2));
+				DIYPhysicsScene->AddActor(ball);
+			}
+		}
 	}
 	//																			YeahYeah
+
+	Plane *plane = new Plane();
+	DIYPhysicsScene->AddActor(plane);
 
 	return true;
 }
@@ -46,7 +55,9 @@ void Force_and_Momentum::onUpdate(float a_deltaTime) {
 		Gizmos::addLine( glm::vec3(10, 0, -10 + i), glm::vec3(-10, 0, -10 + i),  i == 10 ? glm::vec4(1,1,1,1) : glm::vec4(0,0,0,1) );
 	}
 	//																			YeahYeah
-	DIYPhysicsScene->Update(m_window, m_cameraMatrix);
+	if (glfwGetKey(m_window,GLFW_KEY_SPACE) == GLFW_PRESS) {
+	DIYPhysicsScene->Update(m_window, m_cameraMatrix, a_deltaTime);
+	}
 	//																			YeahYeah
 	
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS) {
