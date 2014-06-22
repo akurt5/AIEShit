@@ -10,7 +10,8 @@ void PhysicsObject::Update(float _Delta)
 			Velocity += Resistance;
 		}
 		Velocity += Gravity;
-		Position += Velocity * _Delta;
+		Position += Velocity * (_Delta / 10);
+		std::cout<<Position.y<<'\n';
 		//																			Velocity = glm::vec3(0);
 	}
 }
@@ -79,6 +80,7 @@ void DIYPhisicsHandle::IsCollide(Plane *_ActorA, Sphere *_ActorB)
 
 
 	// Responce
+
 	//	Store Plane Normal
 	glm::vec3 planeNormal = _ActorA->Up;
 
@@ -92,22 +94,21 @@ void DIYPhisicsHandle::IsCollide(Plane *_ActorA, Sphere *_ActorB)
 	glm::vec3 seperationVector = Normal * Depth;
 
 	//	Static Checks
-	if (_ActorA->Static == false && _ActorB->Static == true) {
+	if (_ActorA->Type ==  false && _ActorB->Type ==  true) {
 		_ActorA->Position -= seperationVector;
-		_ActorA->Velocity += (forceVector * 2.0f) / _ActorA->Mass;
+		_ActorA->Velocity += (forceVector * 2.0f);
 	}
-	else if (_ActorA->Static == true && _ActorB->Static == false) {
+	else if (_ActorA->Type ==  true && _ActorB->Type ==  false) {
 		_ActorB->Position += seperationVector;
-		_ActorB->Velocity += (forceVector * 2.0f) / _ActorA->Mass;
+		_ActorB->Velocity -= (forceVector * 2.0f);
 	} 
 	else {
 		_ActorA->Position -= seperationVector * 0.505f;
 		_ActorB->Position += seperationVector * 0.505f;
 
-		_ActorA->Velocity +=( forceVector) / _ActorA->Mass;
-		_ActorB->Velocity +=(-forceVector) / _ActorA->Mass;
+		_ActorA->Velocity += (forceVector);
+		_ActorB->Velocity += (forceVector);
 	}
-
 }
 void DIYPhisicsHandle::IsCollide(Sphere *_ActorB, Plane *_ActorA)
 {
@@ -133,21 +134,21 @@ void DIYPhisicsHandle::IsCollide(Sphere *_ActorA, Sphere *_ActorB)
 		//	Static Checks
 		if (_ActorA->Static == false && _ActorB->Static == true) 
 		{
-			_ActorA->Position -= seperationVector;
-			_ActorA->Velocity -= (forceVector * 2.0f) / _ActorA->Mass;
+			_ActorA->Position += seperationVector;
+			_ActorA->Velocity += (forceVector * 2.0f) / _ActorA->Mass;
 		}
 		else if (_ActorA->Static == true && _ActorB->Static == false) 
 		{
-			_ActorB->Position += seperationVector;
-			_ActorB->Velocity += (forceVector * 2.0f) / _ActorB->Mass;
+			_ActorB->Position -= seperationVector;
+			_ActorB->Velocity -= (forceVector * 2.0f) / _ActorB->Mass;
 		} 
 		else 
 		{
-			_ActorA->Position -= seperationVector * 0.505f;
-			_ActorB->Position += seperationVector * 0.505f;
+			_ActorA->Position += seperationVector * 0.505f;
+			_ActorB->Position -= seperationVector * 0.505f;
 
-			_ActorA->Velocity -= (forceVector) / _ActorA->Mass;
-			_ActorB->Velocity += (forceVector ) / _ActorB->Mass;
+			_ActorA->Velocity += (forceVector) / _ActorA->Mass;
+			_ActorB->Velocity -= (forceVector ) / _ActorB->Mass;
 		}
 	}
 }

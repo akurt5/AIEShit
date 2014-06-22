@@ -7,8 +7,8 @@
 #include <GLFW\glfw3.h>
 
 
-#define Gravity glm::vec3 ( 0, -9.8, 0)
-#define Resistance glm::vec3 (-0.0001)
+#define Gravity glm::vec3 ( 0, -0.098, 0)
+#define Resistance glm::vec3 (-0.001)
 #define VEC3NULL glm::vec3(NULL, NULL, NULL)
 
 class PhysicsObject
@@ -39,7 +39,7 @@ public:
 	PhysicsObject(glm::vec3 _Position)
 	{
 		Static		= false;
-		Mass		= 1.0f;
+ 		Mass		= 1.0f;
 		Velocity	= glm::vec3(0);
 		Position	= _Position;
 		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);

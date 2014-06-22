@@ -27,17 +27,17 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	//																			YeahYeah
 	DIYPhysicsScene = new DIYPhisicsHandle();
 	DIYPhysicsScene->Load();
-	for(int i=0;i<4;i++)
+	/*for(int i=0;i<4;i++)
 	{
 		for(int a=0;a<1;a++)
 		{
 			for(int b=0;b<4;b++)
-			{
-				Sphere *ball = new Sphere(glm::vec3 (i*2, a +5, b*2));
+			{*/
+				Sphere *ball = new Sphere(glm::vec3 (0, 2, 0));
 				DIYPhysicsScene->AddActor(ball);
-			}
+			/*}
 		}
-	}
+	}*/
 	//																			YeahYeah
 
 	Plane *plane = new Plane();
