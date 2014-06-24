@@ -7,8 +7,8 @@
 #include <GLFW\glfw3.h>
 
 
-#define Gravity glm::vec3 ( 0, -0.098, 0)
-#define Resistance glm::vec3 (-0.001)
+#define Gravity glm::vec3 ( 0, -0.98, 0)
+#define Resistance -0.001
 #define VEC3NULL glm::vec3(NULL, NULL, NULL)
 
 class PhysicsObject
@@ -31,7 +31,7 @@ public:
 	PhysicsObject()
 	{
 		Static		= false;
- 		Mass		= 1.0f;
+ 		Mass		= 10.0f;
 		Velocity	= glm::vec3(0);
 		Position	= glm::vec3(0);
 		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
@@ -39,7 +39,7 @@ public:
 	PhysicsObject(glm::vec3 _Position)
 	{
 		Static		= false;
- 		Mass		= 1.0f;
+ 		Mass		= 10.0f;
 		Velocity	= glm::vec3(0);
 		Position	= _Position;
 		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
@@ -73,7 +73,8 @@ public:
 	}
 	Plane() : PhysicsObject()
 	{
-		Up			= glm::normalize(glm::vec3(0, 1, 0));
+		Position	= glm::vec3(0, 0, 0);
+		Up			= glm::normalize(glm::vec3(0, 10, 0));
 		Right		= glm::cross(Up, glm::vec3(0,0,1));
 		Forward		= glm::cross(Up, -Right);
 		Static		= true;
@@ -82,7 +83,6 @@ public:
 		Type = Collider::PLANE; 
 	}
 	~Plane(){}
-	void Create();
 	virtual void Draw() 
 	{
 		glm::vec3 P1	= Position + ( Forward - Right) * 10000.0f;
@@ -118,10 +118,16 @@ public:
 
 	}
 	~Sphere(){}
-	void Create();
 	void Draw(){Gizmos::addSphere(Position, 5, 5, Radius, Colour);}
 
 	float Radius;
+};
+class SpringJoint
+{
+public:
+	SpringJoint(Sphere *_ActorA, Sphere *_ActorB);
+	~SpringJoint();
+
 };
 class DIYPhisicsHandle
 {

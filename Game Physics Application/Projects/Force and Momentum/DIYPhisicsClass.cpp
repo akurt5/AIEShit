@@ -5,16 +5,28 @@ void PhysicsObject::Update(float _Delta)
 {
 	if(!Static)
 	{
-		if(Velocity != VEC3NULL)
-		{
-			Velocity += Resistance;
-		}
-		Velocity += Gravity;
-		Position += Velocity * (_Delta / 10);
+		
+		if(Velocity.x > 0.001){Velocity.x += Resistance;}
+		if(Velocity.y > 0.001){Velocity.y += Resistance;}
+		if(Velocity.z > 0.001){Velocity.z += Resistance;}
+		if(Velocity.x < -0.001){Velocity.x -= Resistance;}
+		if(Velocity.y < -0.001){Velocity.y -= Resistance;}
+		if(Velocity.z < -0.001){Velocity.z -= Resistance;}
+
+   		Velocity += Gravity;
+		Position += Velocity * (_Delta);
 		std::cout<<Position.y<<'\n';
-		//																			Velocity = glm::vec3(0);
 	}
 }
+	SpringJoint::SpringJoint(Sphere *_ActorA, Sphere *_ActorB)
+	{
+
+	}
+	SpringJoint::~SpringJoint()
+	{
+
+	}
+
 DIYPhisicsHandle::DIYPhisicsHandle(void){}
 DIYPhisicsHandle::~DIYPhisicsHandle(void){}
 
@@ -23,13 +35,21 @@ void DIYPhisicsHandle::Load()
 }
 void DIYPhisicsHandle::Update(GLFWwindow *_Window, glm::mat4 _Camera, float _Delta)
 {
-
+	//if(Timer == 0)
+	//{
+	CollideScene();
+	//Timer = 0;
+	//}
+	//else
+	//{
+	//Timer --;
+	//}
 	for(auto Actor : Actors)
 	{
 
 		Actor->Update(_Delta);
 	}
-	CollideScene();
+	
 }
 void DIYPhisicsHandle::Draw ()
 {
@@ -67,7 +87,7 @@ void DIYPhisicsHandle::IsCollide(PhysicsObject *_ActorA, PhysicsObject *_ActorB)
 void DIYPhisicsHandle::IsCollide(Plane *_ActorA, Sphere *_ActorB)
 {
 	//	Detection
-	glm::vec3 APos = _ActorA->Position;//																			 + A->_Offset;
+ 	glm::vec3 APos = _ActorA->Position;//																			 + A->_Offset;
 	glm::vec3 BPos = _ActorB->Position;//																			 + B->_Offset;
 
 	float distance = glm::abs(glm::dot(BPos, _ActorA->Up) - glm::length(APos));
@@ -75,7 +95,7 @@ void DIYPhisicsHandle::IsCollide(Plane *_ActorA, Sphere *_ActorB)
 	if (distance > _ActorB->Radius)
 		return;
 
-	glm::vec3 Normal = _ActorA->Up;
+ 	glm::vec3 Normal = _ActorA->Up;
 	float Depth = _ActorB->Radius - distance;
 
 
@@ -94,20 +114,20 @@ void DIYPhisicsHandle::IsCollide(Plane *_ActorA, Sphere *_ActorB)
 	glm::vec3 seperationVector = Normal * Depth;
 
 	//	Static Checks
-	if (_ActorA->Type ==  false && _ActorB->Type ==  true) {
+	if (_ActorA->Static ==  false && _ActorB->Static ==  true) {
 		_ActorA->Position -= seperationVector;
-		_ActorA->Velocity += (forceVector * 2.0f);
+		_ActorA->Velocity += (forceVector * 2.0f) / _ActorB->Mass;
 	}
-	else if (_ActorA->Type ==  true && _ActorB->Type ==  false) {
+	else if (_ActorA->Static ==  true && _ActorB->Static ==  false) {
 		_ActorB->Position += seperationVector;
-		_ActorB->Velocity -= (forceVector * 2.0f);
+		_ActorB->Velocity += (-forceVector * 2.0f) / _ActorB->Mass;
 	} 
 	else {
 		_ActorA->Position -= seperationVector * 0.505f;
 		_ActorB->Position += seperationVector * 0.505f;
 
-		_ActorA->Velocity += (forceVector);
-		_ActorB->Velocity += (forceVector);
+		_ActorA->Velocity += (forceVector) / _ActorB->Mass;
+		_ActorB->Velocity -= (forceVector) / _ActorB->Mass;
 	}
 }
 void DIYPhisicsHandle::IsCollide(Sphere *_ActorB, Plane *_ActorA)
@@ -161,7 +181,7 @@ void DIYPhisicsHandle::CollideScene()
 		{
 			if(ActorA->Position != ActorB->Position)
 			{
-				 IsCollide(ActorA, ActorB);
+					IsCollide(ActorA, ActorB);
 			}
 		}
 	}
