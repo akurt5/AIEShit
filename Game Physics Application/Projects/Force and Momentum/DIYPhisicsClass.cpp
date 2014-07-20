@@ -6,25 +6,52 @@ void PhysicsObject::Update(float _Delta)
 	if(!Static)
 	{
 		
-		if(Velocity.x > 0.001){Velocity.x += Resistance;}
-		if(Velocity.y > 0.001){Velocity.y += Resistance;}
-		if(Velocity.z > 0.001){Velocity.z += Resistance;}
-		if(Velocity.x < -0.001){Velocity.x -= Resistance;}
-		if(Velocity.y < -0.001){Velocity.y -= Resistance;}
-		if(Velocity.z < -0.001){Velocity.z -= Resistance;}
+		if(Velocity.x > 0.0001 || Velocity.x < -0.0001){Velocity.x *= Resistance;}else{Velocity.x = 0;}
+		if(Velocity.y > 0.0001 || Velocity.y < -0.0001){Velocity.y *= Resistance;}else{Velocity.y = 0;}
+		if(Velocity.z > 0.0001 || Velocity.z < -0.0001){Velocity.z *= Resistance;}else{Velocity.z = 0;}
 
    		Velocity += Gravity;
 		Position += Velocity * (_Delta);
-		std::cout<<Position.y<<'\n';
 	}
 }
 	SpringJoint::SpringJoint(Sphere *_ActorA, Sphere *_ActorB)
 	{
-
+		ActorA = _ActorA;
+		ActorB = _ActorB;
 	}
 	SpringJoint::~SpringJoint()
 	{
 
+	}
+	void SpringJoint::Update(float _K, float _Length)
+ 	{
+		glm::vec3 Delta = ActorA->Position - ActorB->Position;
+		glm::vec3 Norm = glm::normalize(Delta);
+		float Length = glm::length(Delta);
+
+		glm::vec3 RelVel = ActorB->Velocity - ActorA->Velocity;
+		glm::vec3 ForceVector = Norm * (Length - _Length) * _K;
+		ForceVector -= 0.1f * RelVel;
+
+ 		if(ActorA->Static == false && ActorB->Static == true)
+		{
+			ActorA->Velocity -= (ForceVector) * ActorA->Mass;
+		}
+		if(ActorA->Static == false && ActorB->Static == false)
+		{
+			ActorA->Velocity -= (ForceVector) * ActorA->Mass;
+			ActorB->Velocity += (ForceVector) * ActorB->Mass;
+			
+		}
+		if(ActorA->Static == true && ActorB->Static == false)
+		{
+			ForceVector *= ActorB->Mass;
+			ActorB->Velocity += ForceVector;
+
+		}
+		Gizmos::addLine(ActorA->Position, ActorB->Position, glm::vec4(0, 0, 0, 1));
+		Gizmos::addLine(ActorA->Position + glm::vec3(0.5, 0, -0.5), ActorA->Position + ForceVector, glm::vec4(1, 0, 0, 1));
+		Gizmos::addLine(ActorA->Position + glm::vec3(-0.5, 0, 0.5), ActorA->Position + RelVel, glm::vec4(0, 1, 0, 1));
 	}
 
 DIYPhisicsHandle::DIYPhisicsHandle(void){}
@@ -115,15 +142,15 @@ void DIYPhisicsHandle::IsCollide(Plane *_ActorA, Sphere *_ActorB)
 
 	//	Static Checks
 	if (_ActorA->Static ==  false && _ActorB->Static ==  true) {
-		_ActorA->Position -= seperationVector;
-		_ActorA->Velocity += (forceVector * 2.0f) / _ActorB->Mass;
+		_ActorA->Position += seperationVector;
+		_ActorA->Velocity += (forceVector) / _ActorB->Mass;
 	}
 	else if (_ActorA->Static ==  true && _ActorB->Static ==  false) {
 		_ActorB->Position += seperationVector;
-		_ActorB->Velocity += (-forceVector * 2.0f) / _ActorB->Mass;
+		_ActorB->Velocity -= (forceVector) / _ActorB->Mass;
 	} 
 	else {
-		_ActorA->Position -= seperationVector * 0.505f;
+		_ActorA->Position += seperationVector * 0.505f;
 		_ActorB->Position += seperationVector * 0.505f;
 
 		_ActorA->Velocity += (forceVector) / _ActorB->Mass;
@@ -155,12 +182,12 @@ void DIYPhisicsHandle::IsCollide(Sphere *_ActorA, Sphere *_ActorB)
 		if (_ActorA->Static == false && _ActorB->Static == true) 
 		{
 			_ActorA->Position += seperationVector;
-			_ActorA->Velocity += (forceVector * 2.0f) / _ActorA->Mass;
+			_ActorA->Velocity += (forceVector) / _ActorA->Mass;
 		}
 		else if (_ActorA->Static == true && _ActorB->Static == false) 
 		{
 			_ActorB->Position -= seperationVector;
-			_ActorB->Velocity -= (forceVector * 2.0f) / _ActorB->Mass;
+			_ActorB->Velocity -= (forceVector) / _ActorB->Mass;
 		} 
 		else 
 		{
@@ -168,7 +195,7 @@ void DIYPhisicsHandle::IsCollide(Sphere *_ActorA, Sphere *_ActorB)
 			_ActorB->Position -= seperationVector * 0.505f;
 
 			_ActorA->Velocity += (forceVector) / _ActorA->Mass;
-			_ActorB->Velocity -= (forceVector ) / _ActorB->Mass;
+			_ActorB->Velocity -= (forceVector) / _ActorB->Mass;
 		}
 	}
 }

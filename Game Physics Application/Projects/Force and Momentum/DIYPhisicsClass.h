@@ -7,8 +7,8 @@
 #include <GLFW\glfw3.h>
 
 
-#define Gravity glm::vec3 ( 0, -0.98, 0)
-#define Resistance -0.001
+#define Gravity glm::vec3 ( 0, -9.8f, 0)
+#define Resistance 0.99f
 #define VEC3NULL glm::vec3(NULL, NULL, NULL)
 
 class PhysicsObject
@@ -42,6 +42,14 @@ public:
  		Mass		= 10.0f;
 		Velocity	= glm::vec3(0);
 		Position	= _Position;
+		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
+	}
+	PhysicsObject(bool _Static)
+	{
+		Static		= _Static;
+ 		Mass		= 10.0f;
+		Velocity	= glm::vec3(0);
+		Position	= glm::vec3(0);
 		Colour		= glm::vec4(1.0f, 0, 0, 1.0f);
 	}
 	~PhysicsObject(){}
@@ -117,6 +125,11 @@ public:
 		Type = Collider::SPHERE;
 
 	}
+	Sphere(bool _Static) : PhysicsObject(_Static)
+	{
+		Radius		= 1.0f;
+		Type = Collider::SPHERE;
+	}
 	~Sphere(){}
 	void Draw(){Gizmos::addSphere(Position, 5, 5, Radius, Colour);}
 
@@ -128,6 +141,9 @@ public:
 	SpringJoint(Sphere *_ActorA, Sphere *_ActorB);
 	~SpringJoint();
 
+	void Update(float _K, float _Length);
+	
+	Sphere *ActorA, *ActorB;
 };
 class DIYPhisicsHandle
 {

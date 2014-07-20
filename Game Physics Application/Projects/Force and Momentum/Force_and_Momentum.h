@@ -23,7 +23,9 @@ protected:
 	glm::mat4	m_cameraMatrix;
 	glm::mat4	m_projectionMatrix;
 	
-	
+	Sphere *Spring1, *Spring2, *Spring3; 
+	SpringJoint *SP1, *SP2;
+
 	DIYPhisicsHandle *DIYPhysicsScene;
 };
 

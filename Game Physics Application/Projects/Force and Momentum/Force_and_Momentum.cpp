@@ -27,21 +27,35 @@ bool Force_and_Momentum::onCreate(int a_argc, char* a_argv[]) {
 	//																			YeahYeah
 	DIYPhysicsScene = new DIYPhisicsHandle();
 	DIYPhysicsScene->Load();
-	/*for(int i=0;i<4;i++)
+	for(int i=0;i<4;i++)
 	{
 		for(int a=0;a<1;a++)
 		{
 			for(int b=0;b<4;b++)
-			{*/
-				Sphere *ball = new Sphere(glm::vec3 (0, 20, 0));
+			{
+				Sphere *ball = new Sphere(glm::vec3 (i, a+5, b));
 				DIYPhysicsScene->AddActor(ball);
-			/*}
+			}
 		}
-	}*/
-	//																			YeahYeah
+	}
+
+	Spring1 = new Sphere(true);
+	Spring1->Position = glm::vec3(0, 20, 0);
+	DIYPhysicsScene->AddActor(Spring1);
+	Spring2 = new Sphere();
+	Spring2->Position = glm::vec3(0, 2, 0);
+	DIYPhysicsScene->AddActor(Spring2);
+	Spring3 = new Sphere();
+	Spring3->Position = glm::vec3(0, 10, 0);
+	DIYPhysicsScene->AddActor(Spring3);
+
+	SP1 = new SpringJoint(Spring1, Spring2);
+	SP2 = new SpringJoint(Spring2, Spring3);
 
 	Plane *plane = new Plane();
 	DIYPhysicsScene->AddActor(plane);
+	//																			YeahYeah
+	
 
 
 	return true;
@@ -57,11 +71,12 @@ void Force_and_Momentum::onUpdate(float a_deltaTime) {
 	}
 	//																			YeahYeah
 	
-	if (glfwGetKey(m_window,GLFW_KEY_SPACE) == GLFW_PRESS) {
-		
-			DIYPhysicsScene->Update(m_window, m_cameraMatrix, a_deltaTime);
+	//																			if (glfwGetKey(m_window,GLFW_KEY_SPACE) == GLFW_PRESS) {
+		SP1->Update(0.1, 10);
+		SP2->Update(0.1, 10);
+		DIYPhysicsScene->Update(m_window, m_cameraMatrix, a_deltaTime);
 	
-	}
+
 	//																			YeahYeah
 	
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS) {
